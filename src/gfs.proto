@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package gfs;
+
+// Messages
+message StringMessage {
+    string value = 1;
+}
+
+message FileRequest {
+    string filename = 1;
+}
+
+message FileResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ChunkRequest {
+    string chunk_id = 1;
+}
+
+message ChunkResponse {
+    bool success = 1;
+    string message = 2;
+    int64 available_space = 3;
+}
+
+message ReadRequest {
+    string filename = 1;
+    int64 offset = 2;
+    int32 length = 3;
+}
+
+message ReadResponse {
+    bool success = 1;
+    bytes data = 2;
+}
+
+// Master Server Interface
+service MasterServerToClient {
+    rpc ListFiles(StringMessage) returns (StringMessage);
+    rpc CreateFile(FileRequest) returns (FileResponse);
+    rpc AppendFile(FileRequest) returns (FileResponse);
+    rpc CreateChunk(ChunkRequest) returns (ChunkResponse);
+    rpc ReadFile(ReadRequest) returns (ReadResponse);
+    rpc DeleteFile(FileRequest) returns (FileResponse);
+    rpc UndeleteFile(FileRequest) returns (FileResponse);
+}
+
+// Chunk Server Interface
+service ChunkServerToClient {
+    rpc Create(ChunkRequest) returns (ChunkResponse);
+    rpc GetChunkSpace(ChunkRequest) returns (ChunkResponse);
+    rpc Append(ChunkRequest) returns (ChunkResponse);
+    rpc Read(ReadRequest) returns (ReadResponse);
+}

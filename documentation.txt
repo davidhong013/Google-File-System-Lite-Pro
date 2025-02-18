@@ -1,0 +1,32 @@
+After doing some research, i think using gRPC might be the best choice here. Consider setting up docker containers for every servers and clients,
+so that we do not have to worry about the dependecies. 
+Some dependecies we need are : grpcio grpcio-tools
+
+
+
+some of the rpc classes that I compiled:
+
+MasterServerToClientStub:
+    This class is the client-side interface for making requests to the Master Server (in your GFS system). 
+    It defines the methods for interacting with the Master Server (e.g., creating files, reading files, deleting files)
+
+MasterServerToClientServicer:
+    This is the server-side interface for implementing the actual logic of the Master Server. 
+    The methods defined here need to be implemented with the functionality for each operation (like creating files, reading files, etc.)
+
+add_MasterServerToClientServicer_to_server:
+    This function is used to register the MasterServerToClientServicer with a gRPC server. 
+    It binds the service methods to their implementations so that the server knows what to do when it receives requests
+
+MasterServerToClient:
+    Experimental, without using a stub
+
+ChunkServerToClientStub:
+    This is the client-side interface for interacting with the Chunk Server. 
+    It defines methods to interact with the Chunk Server, which handles storing and retrieving file chunks
+
+ChunkServerToClientServicer:
+    This is the server-side counterpart for the ChunkServerToClientStub class. 
+    It's used to implement the actual logic of the Chunk Server
+
+The rest of them are pretty self explanatory i guess
