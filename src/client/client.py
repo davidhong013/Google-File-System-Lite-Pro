@@ -1,6 +1,10 @@
 import os
 import sys
 
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Add it to sys.path
+sys.path.append(parent_dir)
 import grpc
 import gfs_pb2_grpc
 import gfs_pb2
@@ -24,5 +28,36 @@ def list_files(file_path):
         print(f"GRPC Error: {e.code()}: {e.details()}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
+def main():
+    try:
+        while True:
+            command = input("Enter command: ").strip()
+            parts = command.split(maxsplit=1)  # Split into command and argument
+            
+            if not parts:
+                continue  # Ignore empty input
+            
+            cmd = parts[0].lower()  # First part is the command
+            arg = parts[1] if len(parts) > 1 else None  # Second part is the argument (if exists)
+
+            if cmd == "exit":
+                print("Exiting program...")
+                break
+            elif cmd == "list":
+                if arg:
+                    list_files(arg)
+                    # print(arg)
+                else:
+                    print("Error: 'list' command requires a file path.")
+            else:
+                print(f"Unknown command: {cmd}")
+
+    except KeyboardInterrupt:
+        print("\nProgram interrupted. Exiting...")
+
+if __name__ == "__main__":
+    main()
+
 
 
