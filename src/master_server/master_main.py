@@ -1,8 +1,15 @@
 from master_servicer import MasterServerToClientServicer
+from concurrent import futures
+import os
+import sys
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Add it to sys.path
+sys.path.append(parent_dir)
 import grpc
 import gfs_pb2_grpc
 import gfs_pb2
-from concurrent import futures
+
 def serve():
 
     # Set up the server with thread pool for handling requests
