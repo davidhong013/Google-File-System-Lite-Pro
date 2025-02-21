@@ -2,11 +2,14 @@ import os
 import setuptools
 import setuptools.command
 import setuptools.command.build_py
+import setuptools.command.develop
+import setuptools.command.install
 
 
 class BuildProtoCommand(setuptools.command.build_py.build_py):
     def run(self):
         import grpc_tools.protoc
+
         root_dir: str = os.path.abspath(os.path.dirname(__file__))
         gfs_dir: str = os.path.join(root_dir, "src", "gfs")
         proto_path: str = os.path.join(gfs_dir, "gfs.proto")
@@ -19,7 +22,19 @@ class BuildProtoCommand(setuptools.command.build_py.build_py):
                 f"{proto_path}",
             )
         )
-        super().run(self)
+        super().run()
+
+
+class DevelopCommand(setuptools.command.develop.develop):
+    def run(self):
+        self.run_command("build_py")
+        super().run()
+
+
+class InstallCommand(setuptools.command.install.install):
+    def run(self):
+        self.run_command("build_py")
+        super().run()
 
 
 setuptools.setup(
@@ -38,7 +53,11 @@ setuptools.setup(
         "grpcio",
         "protobuf",
     ],
-    cmdclass={"build_py": BuildProtoCommand},
+    cmdclass={
+        "build_py": BuildProtoCommand,
+        "develop": DevelopCommand,
+        "install": InstallCommand,
+    },
     entry_points={
         "console_scripts": [
             "gfs-master=gfs.master_server.master_main:serve",
