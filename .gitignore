@@ -1,4 +1,5 @@
 .DS_Store
+.eggs
 .venv
 __pycache__
 *.egg-info
