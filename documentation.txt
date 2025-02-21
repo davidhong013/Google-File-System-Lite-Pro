@@ -40,9 +40,10 @@ file_object:
     The wrap around of the files, it should contain the information/metadata of the file
     Number of visits of the files
     An array of chunk_objects, because a file can contain many chunks
+    Each entry in the array is a queue of chunk servers,
+    because a chunk can be allocated on multiple chunk servers
 chunk_object:
     The wrap around of the chunks, it should contain the information/metadata of the chunks of a file
-    A queue of chunk servers that are responsible for the current chunk, call it chunk_server_node
     Size of the current chunk(can be an offset, the maximum is 8MB)
 
 
