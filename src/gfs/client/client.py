@@ -33,7 +33,7 @@ def list_files(file_path):
     return 0
 
 
-def create_file(file_path):
+def create_file(file_path:str):
     try:
         master = cfg.master_loc
         file_response = None
@@ -53,6 +53,7 @@ def create_file(file_path):
         data = file_response.message.split("|")
         chunk_index = data[0]
 
+        file_path = file_path.replace("/", "|") # this is because we are not going to implement a rigorous file system path name using trees
         for chunk_servers in data[1:]:
             with grpc.insecure_channel(chunk_servers) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)

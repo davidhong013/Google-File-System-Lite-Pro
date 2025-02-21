@@ -1,20 +1,15 @@
 import os
 import sys
+from .master_server_data import MasterServer
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-# Add it to sys.path
-sys.path.append(parent_dir)
 import grpc
-import gfs_pb2_grpc
-import gfs_pb2
-
-from common import Config as cfg
-from common import Status
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from .. import gfs_pb2, gfs_pb2_grpc
+from ..common import Config as cfg, Status
 
 
 class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):
-    def __init__(self, master):
+    def __init__(self, master:MasterServer):
         self.master = master
 
     def ListFiles(self, request, context):
@@ -23,3 +18,9 @@ class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):
         fpls = self.master.list_files(file_path)
         st = "|".join(fpls)
         return gfs_pb2.StringMessage(value=st)
+
+    def CreateFile(self, request, context):
+        file_path = request.filename
+        answer = self.master.create_files(file_path)
+        answer_transform = '0' + '|'.join(answer)
+        return gfs_pb2.FileResponse(success = True, message = answer_transform)

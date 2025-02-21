@@ -33,3 +33,25 @@ The rest of them are pretty self explanatory i guess
 
 Feb/20: successfully tested the rpc messages on a virtual machine, insecure channel works
 
+
+Data Structures in Master Server:
+file_list: A key-value dictionary that has file names to be keys, and the values to be file_object.
+file_object: 
+    The wrap around of the files, it should contain the information/metadata of the file
+    Number of visits of the files
+    An array of chunk_objects, because a file can contain many chunks
+chunk_object:
+    The wrap around of the chunks, it should contain the information/metadata of the chunks of a file
+    A queue of chunk servers that are responsible for the current chunk, call it chunk_server_node
+    Size of the current chunk(can be an offset, the maximum is 8MB)
+
+
+
+
+Creating a file:
+    when the clients request to create a file, the master server should know it is chunk 0 of the file, and the master server should
+    add the file to its files memory storage. It should also create corresponding file object and chunk object to ensure its file system
+    integrity
+    
+    The master server should randomly assign two chunk servers to the clients to let them create chunk 0 for the file. Due to the limititations, 
+    the default number of replicas of a chunk is 2

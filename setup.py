@@ -4,11 +4,28 @@ import setuptools.command
 import setuptools.command.build_py
 import setuptools.command.develop
 import setuptools.command.install
-
+import shutil
 
 class BuildProtoCommand(setuptools.command.build_py.build_py):
     def run(self):
         import grpc_tools.protoc
+        chunk_storage_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "src", "gfs", "chunk_server", "chunk_storage")
+
+        if not os.path.exists(chunk_storage_dir):
+            os.makedirs(chunk_storage_dir)  # Create the directory if it doesn't exist
+            print(f"Created directory: {chunk_storage_dir}")
+            
+        if os.path.exists(chunk_storage_dir) and os.path.isdir(chunk_storage_dir):
+            for filename in os.listdir(chunk_storage_dir):
+                file_path = os.path.join(chunk_storage_dir, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)  # Remove file
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)  # Remove directory (if any subdirectories exist)
+                    print(f"Deleted: {file_path}")
+                except Exception as e:
+                    print(f"Error deleting {file_path}: {e}")
 
         root_dir: str = os.path.abspath(os.path.dirname(__file__))
         gfs_dir: str = os.path.join(root_dir, "src", "gfs")

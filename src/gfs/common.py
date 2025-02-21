@@ -2,9 +2,9 @@ class Config(object):
     # left to be changed
     chunk_size = 5
     master_loc = "104.248.169.227:50051"
-    chunkserver_locs = ["50052", "50053", "50054", "50055", "50056"]
+    chunkserver_locs = ["104.248.169.227:50051", "50053", "50054", "50055", "50056"]
     chunkserver_root = "root_chunkserver"
-    default_chunk_size = 10  # megabytes
+    default_chunk_size = 1048576  # 8megabytes
 
 
 class Status(object):

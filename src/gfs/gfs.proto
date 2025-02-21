@@ -59,7 +59,7 @@ service ChunkServerToClient {
 // Master Server to Chunk Server communication
 service MasterServerToChunkServer {
     
-    rpc DuplicateFile(ChunkRequest) returns (ChunkResponse);
+    rpc DuplicateFile(FileRequest) returns (ChunkResponse);
     rpc DeleteFile(ChunkRequest) returns (ChunkResponse);   // e.g., for deleting a chunk
 }
 

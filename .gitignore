@@ -1,6 +1,8 @@
 .DS_Store
 .eggs
 .venv
+.idea
 __pycache__
 *.egg-info
+src/gfs/chunk_server/chunk_storage
 build
