@@ -1,5 +1,6 @@
 import os
 import sys
+
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 # Add it to sys.path
@@ -10,6 +11,8 @@ import gfs_pb2
 
 from common import Config as cfg
 from common import Status
+
+
 class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer):
     def __init__(self):
         pass
