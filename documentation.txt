@@ -30,3 +30,6 @@ ChunkServerToClientServicer:
     It's used to implement the actual logic of the Chunk Server
 
 The rest of them are pretty self explanatory i guess
+
+Feb/20: successfully tested the rpc messages on a virtual machine, insecure channel works
+

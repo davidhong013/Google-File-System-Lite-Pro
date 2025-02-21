@@ -55,3 +55,17 @@ service ChunkServerToClient {
     rpc Append(ChunkRequest) returns (ChunkResponse);
     rpc Read(ReadRequest) returns (ReadResponse);
 }
+
+// Master Server to Chunk Server communication
+service MasterServerToChunkServer {
+    
+    rpc DuplicateFile(ChunkRequest) returns (ChunkResponse);
+    rpc DeleteFile(ChunkRequest) returns (ChunkResponse);   // e.g., for deleting a chunk
+}
+
+// Chunk Server to Chunk Server communication
+service ChunkServerToChunkServer {
+    rpc ReplicateChunk(ChunkRequest) returns (ChunkResponse);  // For chunk replication across servers
+    rpc SyncChunkData(ChunkRequest) returns (ChunkResponse);   // Synchronize data between chunk servers
+}
+

@@ -560,3 +560,242 @@ class ChunkServerToClient(object):
             timeout,
             metadata,
             _registered_method=True)
+
+
+class MasterServerToChunkServerStub(object):
+    """Master Server to Chunk Server communication
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.DuplicateFile = channel.unary_unary(
+                '/gfs.MasterServerToChunkServer/DuplicateFile',
+                request_serializer=gfs__pb2.FileRequest.SerializeToString,
+                response_deserializer=gfs__pb2.ChunkResponse.FromString,
+                _registered_method=True)
+        self.DeleteFile = channel.unary_unary(
+                '/gfs.MasterServerToChunkServer/DeleteFile',
+                request_serializer=gfs__pb2.FileRequest.SerializeToString,
+                response_deserializer=gfs__pb2.ChunkResponse.FromString,
+                _registered_method=True)
+
+
+class MasterServerToChunkServerServicer(object):
+    """Master Server to Chunk Server communication
+    """
+
+    def DuplicateFile(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteFile(self, request, context):
+        """e.g., for deleting a chunk
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_MasterServerToChunkServerServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'DuplicateFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.DuplicateFile,
+                    request_deserializer=gfs__pb2.FileRequest.FromString,
+                    response_serializer=gfs__pb2.ChunkResponse.SerializeToString,
+            ),
+            'DeleteFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteFile,
+                    request_deserializer=gfs__pb2.FileRequest.FromString,
+                    response_serializer=gfs__pb2.ChunkResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'gfs.MasterServerToChunkServer', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('gfs.MasterServerToChunkServer', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class MasterServerToChunkServer(object):
+    """Master Server to Chunk Server communication
+    """
+
+    @staticmethod
+    def DuplicateFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/gfs.MasterServerToChunkServer/DuplicateFile',
+            gfs__pb2.FileRequest.SerializeToString,
+            gfs__pb2.ChunkResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/gfs.MasterServerToChunkServer/DeleteFile',
+            gfs__pb2.FileRequest.SerializeToString,
+            gfs__pb2.ChunkResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class ChunkServerToChunkServerStub(object):
+    """Chunk Server to Chunk Server communication
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.ReplicateChunk = channel.unary_unary(
+                '/gfs.ChunkServerToChunkServer/ReplicateChunk',
+                request_serializer=gfs__pb2.FileRequest.SerializeToString,
+                response_deserializer=gfs__pb2.ChunkResponse.FromString,
+                _registered_method=True)
+        self.SyncChunkData = channel.unary_unary(
+                '/gfs.ChunkServerToChunkServer/SyncChunkData',
+                request_serializer=gfs__pb2.FileRequest.SerializeToString,
+                response_deserializer=gfs__pb2.ChunkResponse.FromString,
+                _registered_method=True)
+
+
+class ChunkServerToChunkServerServicer(object):
+    """Chunk Server to Chunk Server communication
+    """
+
+    def ReplicateChunk(self, request, context):
+        """For chunk replication across servers
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SyncChunkData(self, request, context):
+        """Synchronize data between chunk servers
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_ChunkServerToChunkServerServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'ReplicateChunk': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReplicateChunk,
+                    request_deserializer=gfs__pb2.FileRequest.FromString,
+                    response_serializer=gfs__pb2.ChunkResponse.SerializeToString,
+            ),
+            'SyncChunkData': grpc.unary_unary_rpc_method_handler(
+                    servicer.SyncChunkData,
+                    request_deserializer=gfs__pb2.FileRequest.FromString,
+                    response_serializer=gfs__pb2.ChunkResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'gfs.ChunkServerToChunkServer', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('gfs.ChunkServerToChunkServer', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class ChunkServerToChunkServer(object):
+    """Chunk Server to Chunk Server communication
+    """
+
+    @staticmethod
+    def ReplicateChunk(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/gfs.ChunkServerToChunkServer/ReplicateChunk',
+            gfs__pb2.FileRequest.SerializeToString,
+            gfs__pb2.ChunkResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SyncChunkData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/gfs.ChunkServerToChunkServer/SyncChunkData',
+            gfs__pb2.FileRequest.SerializeToString,
+            gfs__pb2.ChunkResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
