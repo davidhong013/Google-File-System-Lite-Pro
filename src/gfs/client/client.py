@@ -1,16 +1,11 @@
+import grpc
 import os
 import sys
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-# Add it to sys.path
-sys.path.append(parent_dir)
-import grpc
-import gfs_pb2_grpc
-import gfs_pb2
-
-from common import Config as cfg
-from common import isint
+from .. import gfs_pb2, gfs_pb2_grpc
+from ..common import Config as cfg, isint
 
 
 def list_files(file_path):
