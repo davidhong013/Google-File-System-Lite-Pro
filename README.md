@@ -24,7 +24,7 @@ python3 setup.py develop
 ```
 so your update in the source code could be synchronized automatically.
 
-# Executable
+## Executable
 
 We provide two executables currently. They're installed after you finished the above step. You can invoke them with the following command in your bash
 ```bash
@@ -32,7 +32,7 @@ gfs-master
 gfs-client
 ```
 
-# Format Your Code
+## Format Your Code
 
 To make our directory clean, please check your commit before pushing them to the remote repo to make sure there are no side-effect artifacts like *.pyc, .DS_Store and some other products. And remember run
 ```bash
