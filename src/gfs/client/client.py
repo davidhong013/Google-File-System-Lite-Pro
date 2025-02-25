@@ -95,6 +95,11 @@ def main():
                     # print(arg)
                 else:
                     print("Error: 'list' command requires a file path.")
+            elif cmd == "create":
+                if arg:
+                    create_file(arg)
+                else:
+                    print("Error: 'create' command requires a file path.")
             else:
                 print(f"Unknown command: {cmd}")
 
