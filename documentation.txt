@@ -62,3 +62,7 @@ Creating a file:
 to run the master docker on server:
 docker build -t my-python-app .
 docker run -p 50051:50051 my-python-app
+
+
+to run the chunk server on server:
+gfs-chunk ipaddress port
