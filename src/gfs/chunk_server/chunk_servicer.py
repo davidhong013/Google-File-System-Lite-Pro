@@ -13,7 +13,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer):
 
     def Create(self, request, context):
         file_name =  request.chunk_id
-        directory = './chunk_storage/' + file_name
+        directory = './src/gfs/chunk_server/chunk_storage/' + file_name
         print(directory)
         with open(directory, 'w') as file:
             file.write("Initiated a file in GFS_Lite_Pro")
