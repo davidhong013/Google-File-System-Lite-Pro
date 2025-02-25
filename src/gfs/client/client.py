@@ -52,8 +52,10 @@ def create_file(file_path:str):
 
         data = file_response.message.split("|")
         chunk_index = data[0]
-
-        file_path = file_path.replace("/", "|") # this is because we are not going to implement a rigorous file system path name using trees
+        print("Hi im here" + chunk_index)
+        file_path = file_path.replace("/", "|")
+        # this is because we are not going to implement a rigorous file system path name using trees
+        print(file_path)
         for chunk_servers in data[1:]:
             with grpc.insecure_channel(chunk_servers) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)

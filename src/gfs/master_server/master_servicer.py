@@ -24,5 +24,5 @@ class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):
         answer = self.master.create_files(file_path)
         if answer[0] == 'Error':
             return gfs_pb2.FileResponse(success = False, message="file creation failed")
-        answer_transform = '0' + '|'.join(answer)
+        answer_transform = '0|' + '|'.join(answer)
         return gfs_pb2.FileResponse(success = True, message = answer_transform)
