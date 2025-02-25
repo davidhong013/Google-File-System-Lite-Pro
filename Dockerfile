@@ -10,6 +10,7 @@ COPY . /app
 
 # Step 4: Install necessary Python packages using pip (including grpcio-tools)
 RUN pip install --no-cache-dir -r requirements.txt
+RUN python3 setup.py install
 
 # Step 5: Expose the ports your services will use (change these if necessary)
 EXPOSE 50051
