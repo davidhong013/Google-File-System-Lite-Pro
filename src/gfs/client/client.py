@@ -53,14 +53,14 @@ def create_file(file_path:str):
         data = file_response.message.split("|")
         chunk_index = data[0]
         print("Hi im here" + chunk_index)
-        file_path = file_path.replace("/", "|")
+        file_path = file_path.replace("/", "_")
         # this is because we are not going to implement a rigorous file system path name using trees
         print(file_path)
         for chunk_servers in data[1:]:
             with grpc.insecure_channel(chunk_servers) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
                 chunk_request = gfs_pb2.ChunkRequest(
-                    chunk_id=file_path + "|" + chunk_index
+                    chunk_id=file_path + "_" + chunk_index
                 )
                 chunk_response = stub.Create(chunk_request)
                 if not chunk_response or not chunk_response.success:

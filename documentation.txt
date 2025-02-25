@@ -56,3 +56,9 @@ Creating a file:
     
     The master server should randomly assign two chunk servers to the clients to let them create chunk 0 for the file. Due to the limititations, 
     the default number of replicas of a chunk is 2
+
+
+
+to run the master docker on server:
+docker build -t my-python-app .
+docker run -p 50051:50051 my-python-app
