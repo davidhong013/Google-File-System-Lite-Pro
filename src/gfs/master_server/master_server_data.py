@@ -2,12 +2,13 @@ import os
 import sys
 import random
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from typing import List
+from typing import List, Dict
 from ..common import Config as cfg, Status
 from .master_utils import FileObject,ChunkObject
+from datetime import datetime, time
 class MasterServer:
     def __init__(self):
-        self.file_list = {}
+        self.file_list: Dict[str, FileObject] = {}
         self.file_list['/'] = None
 
     def list_files(self, path:str) -> List[str]:
@@ -30,6 +31,25 @@ class MasterServer:
             file_object.add_chunk_server(chunk)
         self.file_list[path] = file_object
         return sampled_address
+
+    def request_lease(self, path:str) -> List[str]:
+        if path not in self.file_list:
+            return ['Error']
+        chunk_array = self.file_list[path].get_chunk_array()
+        main_chunk = random.sample(chunk_array,1)[0].chunk_address
+        secondary_chunks = []
+        for chunk in chunk_array:
+            if chunk.chunk_address != main_chunk:
+                secondary_chunks.append(chunk.chunk_address)
+        now = datetime.now().time()
+
+        # Convert datetime to string
+        time_str = now.strftime('%H:%M:%S')
+        answer = [time_str, main_chunk]
+        answer.extend(secondary_chunks)
+        return answer
+
+
 
         
         

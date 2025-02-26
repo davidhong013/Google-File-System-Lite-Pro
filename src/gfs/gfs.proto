@@ -41,6 +41,7 @@ message ReadResponse {
 service MasterServerToClient {
     rpc ListFiles(StringMessage) returns (StringMessage);
     rpc CreateFile(FileRequest) returns (FileResponse);
+    rpc RequestLease(FileRequest) returns (FileResponse);
     rpc AppendFile(FileRequest) returns (FileResponse);
     rpc CreateChunk(ChunkRequest) returns (ChunkResponse);
     rpc ReadFile(ReadRequest) returns (ReadResponse);
