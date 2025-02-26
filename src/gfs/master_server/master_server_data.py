@@ -19,16 +19,15 @@ class MasterServer:
 
         return result
     
-    def create_files(self, path:str) -> List[str]:
+    def create_files(self, path:str,  num_of_replicas = 2) -> List[str]:
         parent_dir = os.path.dirname(path)
         if parent_dir not in self.file_list:
             return ['Error']
-        sampled_address = random.sample(cfg.chunkserver_locs,2)
+        sampled_address = random.sample(cfg.chunkserver_locs,num_of_replicas)
         file_object = FileObject(path)
-        file_object.append_chunk_array()
         for address in sampled_address:
             chunk = ChunkObject(address)
-            file_object.add_chunk_server(chunk,0)
+            file_object.add_chunk_server(chunk)
         self.file_list[path] = file_object
         return sampled_address
 

@@ -8,13 +8,15 @@ from ..common import Config as cfg, Status
 
 class ChunkObject:
     def __init__(self, chunk_address:str):
-        self.available_disk = cfg.default_chunk_size
         self.chunk_address = chunk_address
 
 class FileObject:
     def __init__(self, file_name: str):
         self.__file_name = file_name  # Private variable (double underscore)
         self.__number_of_visits = 0  # Private variable
+
+
+        ##this is the variable that records the corresponding chunk servers for a single file object
         self.__chunk_array = []  # Private variable
 
     # Getter for __file_name
@@ -37,10 +39,7 @@ class FileObject:
     def get_chunk_array(self) -> list:
         return self.__chunk_array
 
-    # Setter for __chunk_array
-    def append_chunk_array(self):
-        self.__chunk_array.append(deque())
 
-    def add_chunk_server(self,chunk:ChunkObject, chunkId:int):
-        self.__chunk_array[chunkId].append(chunk)
+    def add_chunk_server(self,chunk:ChunkObject):
+        self.__chunk_array.append(chunk)
 
