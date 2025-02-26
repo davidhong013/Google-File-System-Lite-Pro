@@ -6,7 +6,8 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from .. import gfs_pb2, gfs_pb2_grpc
-from ..common import Config as cfg, isint,ClientLease
+from ..common import Config as cfg, isint
+from .client_lease import ClientLease
 
 
 

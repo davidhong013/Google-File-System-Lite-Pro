@@ -39,12 +39,11 @@ file_list: A key-value dictionary that has file names to be keys, and the values
 file_object: 
     The wrap around of the files, it should contain the information/metadata of the file
     Number of visits of the files
-    An array of chunk_objects, because a file can contain many chunks
     Each entry in the array is a queue of chunk servers,
-    because a chunk can be allocated on multiple chunk servers
+    because file can be allocated on multiple chunk servers
 chunk_object:
     The wrap around of the chunks, it should contain the information/metadata of the chunks of a file
-    Size of the current chunk(can be an offset, the maximum is 8MB)
+
 
 
 
@@ -66,3 +65,5 @@ docker run -p 50051:50051 my-python-app
 
 to run the chunk server on server:
 gfs-chunk ipaddress port
+
+User version number of files to keep track if the data is stale
