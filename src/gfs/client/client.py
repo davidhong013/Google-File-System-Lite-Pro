@@ -31,10 +31,11 @@ class GFSClient:
                 return False
 
             data = file_response.message.split("|")
-            secondary_chunks = None if len(data) < 2 else data[2:]
+            secondary_chunks = None if len(data) < 4 else data[2: -1]
             client_lease = ClientLease(lease_assign_time=datetime.strptime(data[0], '%H:%M:%S').time(),
                                        primary_chunk=data[1],
-                                       secondary_chunks=secondary_chunks)
+                                       secondary_chunks=secondary_chunks,
+                                       version_number=data[-1])
             self.fileLocationCache[file_path] = client_lease
 
         except grpc.RpcError as e:

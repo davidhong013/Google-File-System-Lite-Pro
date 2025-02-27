@@ -47,6 +47,7 @@ class MasterServer:
         time_str = now.strftime('%H:%M:%S')
         answer = [time_str, main_chunk]
         answer.extend(secondary_chunks)
+        answer.append(str(self.file_list[path].version_number))
         return answer
 
 
