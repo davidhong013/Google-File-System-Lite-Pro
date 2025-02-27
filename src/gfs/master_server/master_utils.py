@@ -13,8 +13,10 @@ class ChunkObject:
 class FileObject:
     def __init__(self, file_name: str):
         self.__file_name = file_name  # Private variable (double underscore)
-        self.__number_of_visits = 0  # Private variable
-
+        self.version_number = 0 # Private variable, this variable is mainly used to check
+                                # within the heartbeat message.
+                                # we need a hearbeat meassage because the master server is going to dynamically
+                                # allocate chunk servers based on user needs
 
         ##this is the variable that records the corresponding chunk servers for a single file object
         self.__chunk_array = []  # Private variable
@@ -27,13 +29,7 @@ class FileObject:
     def set_file_name(self, file_name: str):
         self.__file_name = file_name
 
-    # Getter for __number_of_visits
-    def get_number_of_visits(self) -> int:
-        return self.__number_of_visits
 
-    # Setter for __number_of_visits
-    def increment_number_of_visits(self):
-        self.__number_of_visits += 1
 
     # Getter for __chunk_array
     def get_chunk_array(self) -> list:
