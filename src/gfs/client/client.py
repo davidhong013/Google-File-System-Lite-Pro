@@ -17,6 +17,34 @@ class GFSClient:
         self.master = cfg.master_loc  # Master server location
         self.fileLocationCache: Dict[str, ClientLease] = {} # maps the file names to ClientLease object
 
+    @staticmethod
+    def path_name_transform(path:str) -> str:
+        return path.replace("/", "_")
+
+    def verify_lease(self,file_path:str) -> bool:
+        """communicate with master server to verify if the current lease has the correct version number"""
+        try:
+            if file_path not in self.fileLocationCache:
+                return False
+            with grpc.insecure_channel(self.master) as channel:
+                stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
+                request = gfs_pb2.FileRequest(filename=file_path)
+                file_response = stub.RequestLease(request)
+
+            if not file_response or not file_response.success:
+                print("Error occurred, such lease does not exist in master server")
+                return False
+
+            version_number = file_response.message
+            if version_number != self.fileLocationCache[file_path].version_number:
+                return False
+
+        except grpc.RpcError as e:
+            print(f"GRPC Error: {e.code()}: {e.details()}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        return True
+
     def request_lease(self,file_path:str) -> bool:
         """communicate with master server to get a new lease for a file,
         returns false if no lease can be returned"""
@@ -77,7 +105,8 @@ class GFSClient:
             data = file_response.message.split("|")
             chunk_index = data[0]
             print("Hi, I'm here " + chunk_index)
-            file_path = file_path.replace("/", "_")  # Simplified file naming
+            # file_path = file_path.replace("/", "_")  # Simplified file naming
+            file_path = GFSClient.path_name_transform(file_path)
             print(file_path)
 
             for chunk_server in data[1:]:
@@ -94,6 +123,44 @@ class GFSClient:
             print(f"GRPC Error: {e.code()}: {e.details()}")
         except Exception as e:
             print(f"An error occurred: {e}")
+
+    def write_to_file(self, file_path: str, content_to_be_written:str) -> bool:
+        """Clients write content to a file. Here is the basic work flow
+        1.Gets the lock first
+        2.Verify the lease
+        3.If the lease does not match, grants the lease
+        4.Perform write operations to the chunk servers
+        5.Sends an ack to the Master server to unlock the locks"""
+        try:
+            with grpc.insecure_channel(self.master) as channel:
+                stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
+                request = gfs_pb2.FileRequest(filename=file_path)
+                file_response = stub.AppendFile(request)
+            if not file_response or not file_response.success:
+                print("Error occurred, file write failed, check if the file exists in the file system")
+                return False
+            if not self.verify_lease(file_path) and not self.request_lease(file_path):
+                return False
+            lease_object = self.fileLocationCache[file_path]
+            with grpc.insecure_channel(lease_object.primary_chunk) as channel:
+                stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
+                secondary = '|'.join(lease_object.secondary_chunks)
+                file_path_for_chunk = GFSClient.path_name_transform(file_path)
+                request = gfs_pb2.AppendRequest(file_name = file_path_for_chunk,content = content_to_be_written,secondary_chunk = secondary)
+                chunk_response = stub.Append(request)
+            if not chunk_response or not chunk_response.success:
+                print("Error occurred, file write failed, something went wrong with the chunk servers")
+            with grpc.insecure_channel(self.master) as channel:
+                stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
+                request = gfs_pb2.FileRequest(filename=file_path)
+                ack_response = stub.AppendAck(request)
+            if not ack_response or not ack_response.success:
+                return False
+        except grpc.RpcError as e:
+            print(f"GRPC Error: {e.code()}: {e.details()}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        return True
 
     def run(self):
         """Main loop for client interaction"""

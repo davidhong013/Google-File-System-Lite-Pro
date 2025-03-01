@@ -18,3 +18,9 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer):
         with open(directory, 'w') as file:
             file.write("Initiated a file in GFS_Lite_Pro\n")
         return gfs_pb2.ChunkResponse(success = True,message = "Initiated a file",available_space = cfg.default_chunk_size)
+
+    def Append(self, request, context):
+        file_name = request.file_name
+        content = request.content
+        secondary_chunks = request.secondary_chunk.split('|') if request.secondary_chunk else []
+        

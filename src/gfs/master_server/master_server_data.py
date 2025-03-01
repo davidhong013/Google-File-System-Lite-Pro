@@ -50,6 +50,30 @@ class MasterServer:
         answer.append(str(self.file_list[path].version_number))
         return answer
 
+    def verify_lease(self,path) -> str:
+        if path not in self.file_list:
+            return 'Error'
+        return str(self.file_list[path].version_number)
+
+    def append_file(self,path) -> str:
+        if path not in self.file_list:
+            return 'Error'
+        file_object = self.file_list[path]
+        with file_object.file_lock:
+            while file_object.is_busy:
+                file_object.file_wait_queue.wait()
+            file_object.is_busy = True
+        return 'True'
+
+    def append_ack(self,path:str) -> str:
+        if path not in self.file_list:
+            return 'Error'
+        file_object = self.file_list[path]
+        with file_object.file_lock:
+            file_object.is_busy = False
+            file_object.file_wait_queue.notify_all()
+        return 'True'
+
 
 
         
