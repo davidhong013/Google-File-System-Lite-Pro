@@ -99,8 +99,8 @@ class GFSClient:
                 file_response = stub.CreateFile(request)
 
             if not file_response or not file_response.success:
-                print("Error occurred, file creation failed")
-                return -1
+                print("File creation failed. Check if the parent directory exists and the current file exists")
+                return False
 
             data = file_response.message.split("|")
             chunk_index = data[0]
@@ -112,17 +112,18 @@ class GFSClient:
             for chunk_server in data[1:]:
                 with grpc.insecure_channel(chunk_server) as channel:
                     stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
-                    chunk_request = gfs_pb2.ChunkRequest(chunk_id=file_path + "_" + chunk_index)
+                    chunk_request = gfs_pb2.ChunkRequest(chunk_id=file_path)
                     chunk_response = stub.Create(chunk_request)
 
-                    if not chunk_response or not chunk_response.success:
-                        print("Error occurred when talking to the chunk servers")
-                        return -1
+                if not chunk_response or not chunk_response.success:
+                    print("Error occurred when talking to the chunk servers")
+                    return -1
 
         except grpc.RpcError as e:
             print(f"GRPC Error: {e.code()}: {e.details()}")
         except Exception as e:
             print(f"An error occurred: {e}")
+        return True
 
     def write_to_file(self, file_path: str, content_to_be_written:str) -> bool:
         """Clients write content to a file. Here is the basic work flow

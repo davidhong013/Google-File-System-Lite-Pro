@@ -66,4 +66,11 @@ docker run -p 50051:50051 my-python-app
 to run the chunk server on server:
 gfs-chunk ipaddress port
 
-User version number of files to keep track if the data is stale
+Meta data design in chunk servers to help write operations:
+    In each chunk server we are going to have
+    1. A dictionary that maps the file name to a Chunk File Object
+Structure of a Chunk File Object:
+    1. Name of the current file
+    2. An array of names of corresponding chunks stored on the disk, Note that this designed to be filename + _chunkindex
+    3. Offset of the last chunk in the array
+    4. Number of Reads from clients

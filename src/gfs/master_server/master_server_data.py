@@ -22,7 +22,7 @@ class MasterServer:
     
     def create_files(self, path:str,  num_of_replicas = 2) -> List[str]:
         parent_dir = os.path.dirname(path)
-        if parent_dir not in self.file_list:
+        if parent_dir not in self.file_list or path in self.file_list:
             return ['Error']
         sampled_address = random.sample(cfg.chunkserver_locs,num_of_replicas)
         file_object = FileObject(path)
