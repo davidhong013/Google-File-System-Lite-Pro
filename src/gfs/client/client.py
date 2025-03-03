@@ -192,6 +192,16 @@ class GFSClient:
                         self.create_file(arg)
                     else:
                         print("Error: 'create' command requires a file path.")
+                elif cmd == "write":
+                    if arg:
+                        parts = arg.split(maxsplit=1)
+                        if len(parts) > 1:
+                            file_name, content = parts
+                            self.write_to_file(file_name, content)
+                        else:
+                            print("Error: 'write' command requires both a file name and content.")
+                    else:
+                        print("Error: 'write' command requires a file name and content.")
                 else:
                     print(f"Unknown command: {cmd}")
 
