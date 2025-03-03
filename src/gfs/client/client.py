@@ -3,6 +3,9 @@ import os
 import sys
 from typing import List,Dict
 from datetime import datetime
+
+from twisted.conch.scripts.tkconch import options
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from .. import gfs_pb2, gfs_pb2_grpc
@@ -105,7 +108,7 @@ class GFSClient:
             data = file_response.message.split("|")
             chunk_index = data[0]
             print("Hi, I'm here " + chunk_index)
-            # file_path = file_path.replace("/", "_")  # Simplified file naming
+            # Simplified file naming, note that this is a critical STEP !!!!!!!!!!
             file_path = GFSClient.path_name_transform(file_path)
             print(file_path)
 
@@ -143,7 +146,7 @@ class GFSClient:
             if not self.verify_lease(file_path) and not self.request_lease(file_path):
                 return False
             lease_object = self.fileLocationCache[file_path]
-            with grpc.insecure_channel(lease_object.primary_chunk) as channel:
+            with grpc.insecure_channel(lease_object.primary_chunk,options = cfg.message_options) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
                 secondary = '|'.join(lease_object.secondary_chunks)
                 file_path_for_chunk = GFSClient.path_name_transform(file_path)

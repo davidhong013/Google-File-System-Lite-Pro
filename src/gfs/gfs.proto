@@ -74,7 +74,7 @@ service MasterServerToChunkServer {
 
 // Chunk Server to Chunk Server communication
 service ChunkServerToChunkServer {
-    rpc AppendChunk(AppendRequest) returns (ChunkResponse);  // For chunk replication across servers
+    rpc Append_ChunkToChunk(AppendRequest) returns (ChunkResponse);  // For chunk replication across servers
     rpc SyncChunkData(ChunkRequest) returns (ChunkResponse);   // Synchronize data between chunk servers
 }
 

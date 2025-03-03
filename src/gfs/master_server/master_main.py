@@ -4,13 +4,14 @@ from concurrent import futures
 from .master_servicer import MasterServerToClientServicer
 from .master_server_data import MasterServer
 from .. import gfs_pb2_grpc
+from ..common import Config as cfg
 
 
 def serve():
 
     # Set up the server with thread pool for handling requests
     master = MasterServer()
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4),options=cfg.message_options)
     gfs_pb2_grpc.add_MasterServerToClientServicer_to_server(
         MasterServerToClientServicer(master=master), server
     )
