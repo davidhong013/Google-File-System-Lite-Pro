@@ -55,7 +55,9 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
     def Append_ChunkToChunk(self, request, context):
         file_name = request.file_name
         content = request.content
-        return self.__inwrite(file_name,content)
+        if not self.__inwrite(file_name,content):
+            return gfs_pb2.ChunkResponse(success=False, message="Writing to the secondary chunk failed")
+        return gfs_pb2.ChunkResponse(success=True, message='Write Succeeded')
 
     def Append(self, request, context):
         """Basic work flow:
