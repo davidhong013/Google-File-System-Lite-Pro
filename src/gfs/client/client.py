@@ -4,7 +4,6 @@ import sys
 from typing import List,Dict
 from datetime import datetime
 
-from twisted.conch.scripts.tkconch import options
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -33,7 +32,7 @@ class GFSClient:
                 stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
                 request = gfs_pb2.FileRequest(filename=file_path)
                 file_response = stub.RequestLease(request)
-
+                print('passed the verify lease testing(rpc call)')
             if not file_response or not file_response.success:
                 print("Error occurred, such lease does not exist in master server")
                 return False
@@ -56,6 +55,7 @@ class GFSClient:
                 stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
                 request = gfs_pb2.FileRequest(filename=file_path)
                 file_response = stub.RequestLease(request)
+                print('passed the get lease testing(rpc call)')
 
             if not file_response or not file_response.success:
                 print("Error occurred, request Lease on file failed")
@@ -107,10 +107,9 @@ class GFSClient:
 
             data = file_response.message.split("|")
             chunk_index = data[0]
-            print("Hi, I'm here " + chunk_index)
             # Simplified file naming, note that this is a critical STEP !!!!!!!!!!
             file_path = GFSClient.path_name_transform(file_path)
-            print(file_path)
+
 
             for chunk_server in data[1:]:
                 with grpc.insecure_channel(chunk_server) as channel:
@@ -140,24 +139,28 @@ class GFSClient:
                 stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
                 request = gfs_pb2.FileRequest(filename=file_path)
                 file_response = stub.AppendFile(request)
+                print('Passed the getting lock stage')
             if not file_response or not file_response.success:
                 print("Error occurred, file write failed, check if the file exists in the file system")
                 return False
             if not self.verify_lease(file_path) and not self.request_lease(file_path):
                 return False
             lease_object = self.fileLocationCache[file_path]
+            print('passed the lease stage')
             with grpc.insecure_channel(lease_object.primary_chunk,options = cfg.message_options) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
                 secondary = '|'.join(lease_object.secondary_chunks)
                 file_path_for_chunk = GFSClient.path_name_transform(file_path)
                 request = gfs_pb2.AppendRequest(file_name = file_path_for_chunk,content = content_to_be_written,secondary_chunk = secondary)
                 chunk_response = stub.Append(request)
+                print('Passed the append stage')
             if not chunk_response or not chunk_response.success:
                 print("Error occurred, file write failed, something went wrong with the chunk servers")
             with grpc.insecure_channel(self.master) as channel:
                 stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
                 request = gfs_pb2.FileRequest(filename=file_path)
                 ack_response = stub.AppendAck(request)
+                print('Passed the append ack stage')
             if not ack_response or not ack_response.success:
                 return False
         except grpc.RpcError as e:

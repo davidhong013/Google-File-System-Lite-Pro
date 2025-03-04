@@ -29,14 +29,11 @@ message AppendRequest {
 message ChunkResponse {
     bool success = 1;
     string message = 2;
-    int64 available_space = 3;
 }
 
 
 message ReadRequest {
     string filename = 1;
-    int64 offset = 2;
-    int32 length = 3;
 }
 
 message ReadResponse {

@@ -24,7 +24,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         with open(directory, 'wb') as file:
             text = "Initiated a file in GFS_Lite_Pro\n"
             file.write(text.encode('utf-8'))
-        return gfs_pb2.ChunkResponse(success = True,message = "Initiated a file",available_space = cfg.default_chunk_size)
+        return gfs_pb2.ChunkResponse(success = True,message = "Initiated a file")
 
     def __inwrite(self,file_name,content:str) -> bool:
         file_object = self.metaData[file_name]
@@ -67,12 +67,13 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         content = request.content
         secondary_chunks = request.secondary_chunk.split('|') if request.secondary_chunk else []
         if file_name not in self.metaData:
-            return gfs_pb2.ChunkResponse(success=False, message="The file does not exist",available_space=0)
+            return gfs_pb2.ChunkResponse(success=False, message="The file does not exist")
 
         #Write to the primary chunk server's disk
         result = self.__inwrite(file_name,content)
+        print('write to the disk successfully')
         if not result:
-            return gfs_pb2.ChunkResponse(success=False, message="Writing to the primary chunk failed", available_space=0)
+            return gfs_pb2.ChunkResponse(success=False, message="Writing to the primary chunk failed")
 
         for secondary_chunk in secondary_chunks:
             with grpc.insecure_channel(secondary_chunk,options=cfg.message_options) as channel:
@@ -80,7 +81,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
                 request = gfs_pb2.AppendRequest(file_name = file_name, content = content,secondary_chunk = '')
                 chunk_response = stub.Append_ChunkToChunk(request)
             if not chunk_response or not chunk_response.success:
-                return gfs_pb2.ChunkResponse(success=False, message="writing to the secondary chunks failed",available_space=0)
+                return gfs_pb2.ChunkResponse(success=False, message="writing to the secondary chunks failed")
 
-        return gfs_pb2.ChunkResponse(success = True, message = 'Write Succeeded', available_space = 0)
+        return gfs_pb2.ChunkResponse(success = True, message = 'Write Succeeded')
 
