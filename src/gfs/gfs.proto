@@ -34,6 +34,7 @@ message ChunkResponse {
 
 message ReadRequest {
     string filename = 1;
+    int32 chunk_index = 2;
 }
 
 message ReadResponse {
@@ -60,6 +61,7 @@ service ChunkServerToClient {
     rpc Create(ChunkRequest) returns (ChunkResponse);
     rpc Append(AppendRequest) returns (ChunkResponse);
     rpc Read(ReadRequest) returns (ReadResponse);
+    rpc ChunkNumber(FileRequest) returns (FileResponse);
 }
 
 // Master Server to Chunk Server communication

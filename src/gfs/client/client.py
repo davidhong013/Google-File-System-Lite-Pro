@@ -1,3 +1,5 @@
+from random import random
+
 import grpc
 import os
 import sys
@@ -171,6 +173,52 @@ class GFSClient:
         except Exception as e:
             print(f"An error occurred: {e}")
         return True
+    def __get_chunk_numbers(self,file_path:str,chunk_address:str) -> int:
+        with grpc.insecure_channel(chunk_address) as channel:
+            stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
+            request = gfs_pb2.FileRequest(filename=file_path)
+            response = stub.ChunkNumber(request)
+        if not response or not response.success:
+            return -1
+        return int(response.message)
+
+    def read_from_file(self, file_path:str) -> str:
+        """Clients read from a file, and here is the basic work flow
+        1.Verify the lease
+        2.If the lease does not match, grants the lease
+        3.Grants the minimum number of chunks in every chunk servers
+        4.Randomly sample chunk from the list of chunk servers, and update the corresponding read numbers on that chunk
+        server with lock
+        5.Decode and Concatenate the content"""
+        try:
+            if not self.verify_lease(file_path) and not self.request_lease(file_path):
+                print('Grant Lease Access Failed, make sure the file exists in the system')
+                return 'Failed'
+            lease_object = self.fileLocationCache[file_path]
+            chunk_arr = [lease_object.primary_chunk]  # Start with the primary chunk
+            chunk_arr.extend(lease_object.secondary_chunks)  # Extend with secondary chunks
+            num_chunks = 2**31 - 1
+            file_path_for_chunk = GFSClient.path_name_transform(file_path)
+            for chunk_server in chunk_arr:
+                num_chunks = min(num_chunks, self.__get_chunk_numbers(file_path_for_chunk,chunk_server))
+            if num_chunks == -1:
+                return 'Error Occurred When reading the file'
+            content = ''
+            for index in range(num_chunks):
+                sampled_address = random.sample(chunk_arr,1)[0]
+                with grpc.insecure_channel(sampled_address) as channel:
+                    stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
+                    request = gfs_pb2.ReadRequest(filename = file_path_for_chunk,chunk_index = index)
+                    response = stub.Read(request)
+                if not response or not response.success:
+                    return 'Error Occurred When reading the file'
+                content += response.bytes.decode('utf-8')
+            return content
+        except grpc.RpcError as e:
+            print(f"GRPC Error: {e.code()}: {e.details()}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        return 'Empty'
 
     def run(self):
         """Main loop for client interaction"""
@@ -208,6 +256,12 @@ class GFSClient:
                             print("Error: 'write' command requires both a file name and content.")
                     else:
                         print("Error: 'write' command requires a file name and content.")
+                elif cmd == "read":
+                    if arg:
+                        content = self.read_from_file(arg)
+                        print(content)
+                    else:
+                        print("Error: 'read' command requires a file path.")
                 elif cmd == "testing_write":
                     if arg:
                         parts = arg.split(maxsplit=1)

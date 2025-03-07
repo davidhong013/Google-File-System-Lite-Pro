@@ -87,3 +87,22 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
 
         return gfs_pb2.ChunkResponse(success = True, message = 'Write Succeeded')
 
+    def ChunkNumber(self, request, context):
+        file_name = request.filename
+        if file_name not in self.metaData:
+            return gfs_pb2.FileResponse(success=False, message="The file does not exist")
+        return gfs_pb2.FileResponse(success=True, message=str(len(self.metaData[file_name].chunks_names_array)))
+
+    def Read(self, request, context):
+        file_name = request.filename
+        chunk_index = request.chunk_index
+        if file_name not in self.metaData:
+            return gfs_pb2.ReadResponse(success=False)
+        with self.metaData[file_name].lock:
+            self.metaData[file_name].number_of_reads += 1
+        directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_' + str(chunk_index)
+        with open(directory, "rb") as file:
+            bytes = file.read()
+        return gfs_pb2.ReadResponse(success=True, bytes = bytes)
+
+
