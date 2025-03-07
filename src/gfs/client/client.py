@@ -1,4 +1,4 @@
-from random import random
+import random
 
 import grpc
 import os
@@ -212,7 +212,7 @@ class GFSClient:
                     response = stub.Read(request)
                 if not response or not response.success:
                     return 'Error Occurred When reading the file'
-                content += response.bytes.decode('utf-8')
+                content += response.data.decode('utf-8')
             return content
         except grpc.RpcError as e:
             print(f"GRPC Error: {e.code()}: {e.details()}")

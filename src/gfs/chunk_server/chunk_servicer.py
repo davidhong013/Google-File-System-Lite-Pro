@@ -103,6 +103,6 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_' + str(chunk_index)
         with open(directory, "rb") as file:
             bytes = file.read()
-        return gfs_pb2.ReadResponse(success=True, bytes = bytes)
+        return gfs_pb2.ReadResponse(success=True, data = bytes)
 
 
