@@ -9,8 +9,13 @@ from ..common import Config as cfg, Status
 
 
 class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):
-    def __init__(self, master:MasterServer):
+    def __init__(self, master:MasterServer, option = 'dynamic'):
         self.master = master
+
+        """this initiates the dynamic allocation, if you do not want to dynamically allocate chunks, turn it off"""
+        if option == 'dynamic':
+            self.master.start_dynamic_allocation()
+
 
     def ListFiles(self, request, context):
         """This function is used to list all the files in the file system, it simply traverses through

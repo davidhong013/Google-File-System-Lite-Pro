@@ -9,7 +9,7 @@ from .chunk_utils import ChunkFileObject
 from ..common import Config as cfg, Status
 
 
-class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_pb2_grpc.ChunkServerToChunkServerServicer):
+class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_pb2_grpc.ChunkServerToChunkServerServicer,gfs_pb2_grpc.ChunkServerToMasterServerServicer):
     def __init__(self,address:str):
         self.address = address #this should be the IP address that chunk server is running on
         self.metaData: Dict[str, ChunkFileObject] = {}
@@ -104,5 +104,16 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         with open(directory, "rb") as file:
             bytes = file.read()
         return gfs_pb2.ReadResponse(success=True, data = bytes)
+
+    def GetNumOfRead(self, request, context):
+        """When master server calls this function, it should reset the number of reads on a file"""
+
+        file_name = request.filename
+        if file_name not in self.metaData:
+            return gfs_pb2.ChunkResponse(success=False, message="The file does not exist")
+        num_read = self.metaData[file_name].number_of_reads
+        with self.metaData[file_name].lock:
+            self.metaData[file_name].number_of_reads = 0
+        return gfs_pb2.ChunkResponse(success=True, message=str(num_read))
 
 

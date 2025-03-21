@@ -1,7 +1,11 @@
 import os
 import sys
 import random
+import threading
+import time
+import grpc
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from .. import gfs_pb2, gfs_pb2_grpc
 from typing import List, Dict
 from ..common import Config as cfg, Status
 from .master_utils import FileObject,ChunkObject
@@ -47,13 +51,18 @@ class MasterServer:
         time_str = now.strftime('%H:%M:%S')
         answer = [time_str, main_chunk]
         answer.extend(secondary_chunks)
-        answer.append(str(self.file_list[path].version_number))
+
+        with self.file_list[path].version_lock:
+            answer.append(str(self.file_list[path].version_number))
         return answer
 
     def verify_lease(self,path) -> str:
         if path not in self.file_list:
             return 'Error'
-        return str(self.file_list[path].version_number)
+
+        with self.file_list[path].version_lock:
+            val = str(self.file_list[path].version_number)
+        return val
 
     def append_file(self,path) -> str:
         if path not in self.file_list:
@@ -73,6 +82,45 @@ class MasterServer:
             file_object.is_busy = False
             file_object.file_wait_queue.notify_all()
         return 'True'
+
+    def __getStatistics(self) -> List[List]:
+        stats_Arr = []
+        for file in self.file_list:
+            if file == '/':
+                continue
+            total_num_read = 0
+            file_object = self.file_list[file]
+            chunk_arr = file_object.get_chunk_array()
+            for chunk_object in chunk_arr:
+                chunk_address = chunk_object.chunk_address
+                with grpc.insecure_channel(chunk_address) as channel:
+                    stub = gfs_pb2_grpc.ChunkServerToMasterServerStub(channel)
+                    request = gfs_pb2.FileRequest(filename=file)
+                    response = stub.GetNumOfRead(request)
+                if not response or not response.success:
+                    print("something happened in dynamic allocation", file=sys.stderr)
+                    sys.exit(1)
+                total_num_read += int(response.message)
+            stats_Arr.append([total_num_read / len(chunk_arr), file])
+        sorted_stats = sorted(stats_Arr, key=lambda x: x[0], reverse=True)
+        return sorted_stats
+
+    def __dynamic_allocation(self) -> None:
+        while True:
+            #the task processes every 20 seconds
+            time.sleep(20)
+            #First Step: Get statistics for every files' read operations, and we need to lock it for sure
+            stats_arr = self.__getStatistics()
+            #Second Step: Allocate and Deallocate extra chunk servers based on the statistics.
+            
+
+        return
+
+    def start_dynamic_allocation(self) -> None:
+        daemon_thread=  threading.Thread(target=self.__dynamic_allocation,daemon = True)
+        daemon_thread.start()
+        return
+
 
 
 

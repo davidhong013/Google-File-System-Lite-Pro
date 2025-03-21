@@ -39,6 +39,8 @@ class FileObject:
         self.file_wait_queue = threading.Condition(self.file_lock)
         self.is_busy = False
 
+        self.version_lock = threading.Lock()
+
     # Getter for __chunk_array
     def get_chunk_array(self) -> list:
         return self.__chunk_array
