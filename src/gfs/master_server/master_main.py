@@ -10,15 +10,16 @@ import sys
 def serve():
 
     # Set up the server with thread pool for handling requests
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print("Error: Please specify if you want to enable dynamic allocation", file=sys.stderr)
         sys.exit(1)
     option = sys.argv[1]
     if option != 'dynamic' and option != 'undynamic':
         print("Error: Please specify if you want to enable dynamic allocation, enter dynamic or undynamic", file=sys.stderr)
         sys.exit(1)
+    portion = sys.argv[2]
 
-    master = MasterServer()
+    master = MasterServer(portion=float(portion))
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4),options=cfg.message_options)
     gfs_pb2_grpc.add_MasterServerToClientServicer_to_server(
         MasterServerToClientServicer(master=master, option = option), server

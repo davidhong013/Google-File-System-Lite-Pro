@@ -16,6 +16,7 @@ def serve():
     chunk_server_instance = ChunkServerToClientServicer(address)
     gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(chunk_server_instance,server)
     gfs_pb2_grpc.add_ChunkServerToChunkServerServicer_to_server(chunk_server_instance,server)
+    gfs_pb2_grpc.add_ChunkServerToMasterServerServicer_to_server(chunk_server_instance,server)
 
     server.add_insecure_port(f"[::]:{port}")
 

@@ -11,9 +11,10 @@ from ..common import Config as cfg, Status
 from .master_utils import FileObject,ChunkObject
 from datetime import datetime, time
 class MasterServer:
-    def __init__(self):
+    def __init__(self, portion = 0.3):
         self.file_list: Dict[str, FileObject] = {}
         self.file_list['/'] = None
+        self.portion = portion
 
     def list_files(self, path:str) -> List[str]:
         result = []
@@ -105,19 +106,34 @@ class MasterServer:
         sorted_stats = sorted(stats_Arr, key=lambda x: x[0], reverse=True)
         return sorted_stats
 
+    def __allocate_helper(self,stats_arr:List[List]) -> bool:
+        nums_to_deal = round(self.portion * len(stats_arr))
+        for index in range(nums_to_deal):
+            file = stats_arr[index][1]
+            file_object = self.file_list[file]
+            chunk_arr = file_object.get_chunk_array()
+            #If it reaches the limit, then do not allocate more replicas to the file
+            if len(chunk_arr) == cfg.chunk_size:
+                continue
+
+            
+        return True
+
     def __dynamic_allocation(self) -> None:
         while True:
             #the task processes every 20 seconds
             time.sleep(20)
             #First Step: Get statistics for every files' read operations, and we need to lock it for sure
             stats_arr = self.__getStatistics()
+
             #Second Step: Allocate and Deallocate extra chunk servers based on the statistics.
-            
+
+
 
         return
 
     def start_dynamic_allocation(self) -> None:
-        daemon_thread=  threading.Thread(target=self.__dynamic_allocation,daemon = True)
+        daemon_thread = threading.Thread(target=self.__dynamic_allocation,daemon = True)
         daemon_thread.start()
         return
 

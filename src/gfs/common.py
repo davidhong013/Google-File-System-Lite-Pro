@@ -1,6 +1,6 @@
 class Config(object):
     # left to be changed
-    chunk_size = 5
+    chunk_size = 2
     master_loc = "35.95.188.241:50051"
     chunkserver_locs = ["35.95.188.241:50052", "35.95.188.241:50053"]
     chunkserver_root = "root_chunkserver"
