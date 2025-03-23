@@ -20,11 +20,21 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         file_object.chunks_names_array.append(file_name + '_0')
         self.metaData[file_name] = file_object
         directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_0'
-        print(directory)
+
         with open(directory, 'wb') as file:
             text = "Initiated a file in GFS_Lite_Pro\n"
             file.write(text.encode('utf-8'))
         return gfs_pb2.ChunkResponse(success = True,message = "Initiated a file")
+
+    def __internal_create(self, file_name) -> bool:
+        file_object = ChunkFileObject(file_name)
+        file_object.chunks_names_array.append(file_name + '_0')
+        self.metaData[file_name] = file_object
+        directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_0'
+        with open(directory, 'wb') as file:
+            text = "Initiated a file in GFS_Lite_Pro\n"
+            file.write(text.encode('utf-8'))
+        return True
 
     def __inwrite(self,file_name,content:str) -> bool:
         file_object = self.metaData[file_name]
@@ -117,7 +127,27 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         return gfs_pb2.ChunkResponse(success=True, message=str(num_read))
 
     def SyncChunkData(self, request, context):
-        return
+        file_name = request.file_name
+        content = request.content
+        #First step, clean the old meta data and old file on disk
+        if file_name in self.metaData:
+            chunk_len = len(self.metaData[file_name].chunks_names_array)
+            for chunk_index in range(chunk_len):
+                directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_' + str(chunk_index)
+                if os.path.exists(directory):
+                    try:
+                        os.remove(directory)  # Delete the file
+                    except OSError as e:
+                        print(f"Error deleting {directory}: {e}", file=sys.stderr)
+                else:
+                    print(f"File not found: {directory}", file=sys.stderr)
+            del self.metaData[file_name]
+
+        #second step, recreate the file and write content to it
+        if not self.__internal_create(file_name) or not self.__inwrite(file_name,content.decode('utf-8')):
+            return gfs_pb2.ChunkResponse(success=False, message="Data Recreation failed during synchronization")
+
+        return gfs_pb2.ChunkResponse(success=True, message = "Data Synchronization succeeded")
 
     def DuplicateFile(self, request, context):
         source = request.source
