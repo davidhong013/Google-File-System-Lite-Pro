@@ -116,4 +116,30 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
             self.metaData[file_name].number_of_reads = 0
         return gfs_pb2.ChunkResponse(success=True, message=str(num_read))
 
+    def SyncChunkData(self, request, context):
+        return
+
+    def DuplicateFile(self, request, context):
+        source = request.source
+        destination = request.destination
+        file_name = request.file_name
+        file_object = self.metaData[file_name]
+        content = ''
+
+        #the content of the file is stored as binary format on the disk
+        for index in range(len(file_object.chunks_names_array)):
+            directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_' + str(index)
+            with open(directory, 'rb') as file:
+                content += file.read()
+
+        with grpc.insecure_channel(destination, options=cfg.message_options) as channel:
+            stub = gfs_pb2_grpc.ChunkServerToChunkServerStub(channel)
+            request = gfs_pb2.SyncRequest(file_name = file_name, content = content)
+            response = stub.SyncChunkData(request)
+        if not response or not response.success:
+            return gfs_pb2.ChunkResponse(success=False, message="Data Synchronization failed")
+        return gfs_pb2.ChunkResponse(success=True, message='Data Synchronization Successful')
+
+
+
 

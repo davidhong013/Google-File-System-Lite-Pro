@@ -173,6 +173,7 @@ class GFSClient:
         except Exception as e:
             print(f"An error occurred: {e}")
         return True
+
     def __get_chunk_numbers(self,file_path:str,chunk_address:str) -> int:
         with grpc.insecure_channel(chunk_address) as channel:
             stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)

@@ -11,10 +11,11 @@ from ..common import Config as cfg, Status
 from .master_utils import FileObject,ChunkObject
 from datetime import datetime, time
 class MasterServer:
-    def __init__(self, portion = 0.3):
+    def __init__(self, portion = 0.3, sleep_second = 20):
         self.file_list: Dict[str, FileObject] = {}
         self.file_list['/'] = None
         self.portion = portion
+        self.sleep_second = sleep_second
 
     def list_files(self, path:str) -> List[str]:
         result = []
@@ -99,7 +100,7 @@ class MasterServer:
                     request = gfs_pb2.FileRequest(filename=file)
                     response = stub.GetNumOfRead(request)
                 if not response or not response.success:
-                    print("something happened in dynamic allocation", file=sys.stderr)
+                    print("something happened in dynamic allocation, reading stats stage", file=sys.stderr)
                     sys.exit(1)
                 total_num_read += int(response.message)
             stats_Arr.append([total_num_read / len(chunk_arr), file])
@@ -108,28 +109,78 @@ class MasterServer:
 
     def __allocate_helper(self,stats_arr:List[List]) -> bool:
         nums_to_deal = round(self.portion * len(stats_arr))
+
+        #for allocating extra replicas to the top used servers
         for index in range(nums_to_deal):
             file = stats_arr[index][1]
             file_object = self.file_list[file]
             chunk_arr = file_object.get_chunk_array()
+
             #If it reaches the limit, then do not allocate more replicas to the file
             if len(chunk_arr) == cfg.chunk_size:
                 continue
+            sample_address = random.choice(cfg.chunkserver_locs)
+            my_set = set([element.chunk_address for element in chunk_arr])
 
-            
+            #keep sampling until it is not in the original chunk servers
+            while sample_address in my_set:
+                sample_address = random.choice(cfg.chunkserver_locs)
+
+            #Allocation Operation, and it requires locks to make sure no write operations are currently processing
+            with file_object.file_lock:
+                while file_object.is_busy:
+                    file_object.file_wait_queue.wait()
+                file_object.is_busy = True
+                with grpc.insecure_channel(chunk_arr[0].chunk_address) as channel:
+                    stub = gfs_pb2_grpc.ChunkServerToMasterServerStub(channel)
+                    request = gfs_pb2.DuplicateRequest(source = chunk_arr[0].chunk_address, destination = sample_address, file_name = file)
+                    response = stub.DuplicateFile(request)
+                if not response or not response.success:
+                    print("something happened in dynamic allocation, allocation stage", file=sys.stderr)
+                    sys.exit(1)
+                file_object.add_chunk_server(ChunkObject(sample_address))
+                with file_object.version_lock:
+                    file_object.version_number += 1
+                file_object.is_busy = False
+                file_object.file_wait_queue.notify_all()
+
+        #For deallocating the extra replicas to the least used servers
+        for index in range(len(stats_arr) - 1, len(stats_arr) - 1 - nums_to_deal, - 1):
+            file = stats_arr[index][1]
+            file_object = self.file_list[file]
+            chunk_arr = file_object.get_chunk_array()
+            #if it only has one chunk, then do not proceed
+            if len(chunk_arr) == 1:
+                continue
+            with file_object.file_lock:
+                while file_object.is_busy:
+                    file_object.file_wait_queue.wait()
+                file_object.is_busy = True
+                chunk_arr.pop()
+                with file_object.version_lock:
+                    file_object.version_number += 1
+                file_object.is_busy = False
+                file_object.file_wait_queue.notify_all()
         return True
+    def __print_file_server(self) -> None:
+        print('currently printing servers for all of the files')
+        for file in self.file_list:
+            print(file + ": [", end = '')
+            for chunk in self.file_list[file].get_chunk_array():
+                print(chunk.chunk_address, end = '')
+            print(']')
 
     def __dynamic_allocation(self) -> None:
         while True:
-            #the task processes every 20 seconds
-            time.sleep(20)
+            #the task processes every 20 seconds, adjustale as a hyper parameter
+            time.sleep(self.sleep_second)
             #First Step: Get statistics for every files' read operations, and we need to lock it for sure
             stats_arr = self.__getStatistics()
-
             #Second Step: Allocate and Deallocate extra chunk servers based on the statistics.
+            self.__allocate_helper(stats_arr)
 
-
-
+            #This is merely for debugging purpose
+            self.__print_file_server()
         return
 
     def start_dynamic_allocation(self) -> None:

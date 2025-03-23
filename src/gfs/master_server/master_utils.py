@@ -1,6 +1,7 @@
 from collections import deque
 import sys
 import os
+from typing import List, Dict
 import threading
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -42,7 +43,7 @@ class FileObject:
         self.version_lock = threading.Lock()
 
     # Getter for __chunk_array
-    def get_chunk_array(self) -> list:
+    def get_chunk_array(self) -> List[ChunkObject]:
         return self.__chunk_array
 
 
