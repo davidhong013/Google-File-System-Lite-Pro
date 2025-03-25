@@ -5,7 +5,7 @@ from .master_server_data import MasterServer
 import grpc
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from .. import gfs_pb2, gfs_pb2_grpc
-from ..common import Config as cfg, Status
+
 
 
 class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):

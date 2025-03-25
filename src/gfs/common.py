@@ -19,10 +19,4 @@ class Status(object):
             print(self.e)
 
 
-def isint(e):
-    try:
-        e = int(e)
-    except:
-        return False
-    else:
-        return True
+

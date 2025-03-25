@@ -10,7 +10,7 @@ from datasets import load_dataset
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from .. import gfs_pb2, gfs_pb2_grpc
-from ..common import Config as cfg, isint
+from ..common import Config as cfg
 from .client_lease import ClientLease
 
 
