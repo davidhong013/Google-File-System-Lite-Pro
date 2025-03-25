@@ -154,7 +154,9 @@ class GFSClient:
             # print('passed the lease stage')
             with grpc.insecure_channel(lease_object.primary_chunk,options = cfg.message_options) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
-                secondary = '|'.join(lease_object.secondary_chunks)
+                secondary = ''
+                if lease_object.secondary_chunks:
+                    secondary = '|'.join(lease_object.secondary_chunks)
                 file_path_for_chunk = GFSClient.path_name_transform(file_path)
                 request = gfs_pb2.AppendRequest(file_name = file_path_for_chunk,content = content_to_be_written,secondary_chunk = secondary)
                 chunk_response = stub.Append(request)
