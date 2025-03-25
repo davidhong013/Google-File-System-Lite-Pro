@@ -122,6 +122,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
 
         if file_name not in self.metaData:
             print('receieves get number of read requests from master server, and the file does not exist')
+            print(file_name)
             print(self.metaData)
             return gfs_pb2.ChunkResponse(success=False, message="The file does not exist")
         num_read = self.metaData[file_name].number_of_reads

@@ -174,7 +174,7 @@ class MasterServer:
                 continue
             print(file + ": [", end = '')
             for chunk in self.file_list[file].get_chunk_array():
-                print(chunk.chunk_address, end = '')
+                print(chunk.chunk_address, end = ' ')
             print(']')
 
     def __dynamic_allocation(self) -> None:
