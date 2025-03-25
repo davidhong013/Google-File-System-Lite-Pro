@@ -2,7 +2,7 @@ import os
 import sys
 import random
 import threading
-import time
+import time as myTime
 import grpc
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from .. import gfs_pb2, gfs_pb2_grpc
@@ -174,7 +174,7 @@ class MasterServer:
     def __dynamic_allocation(self) -> None:
         while True:
             #the task processes every 20 seconds, adjustale as a hyper parameter
-            time.sleep(self.sleep_second)
+            myTime.sleep(self.sleep_second)
             #First Step: Get statistics for every files' read operations, and we need to lock it for sure
             stats_arr = self.__getStatistics()
             #Second Step: Allocate and Deallocate extra chunk servers based on the statistics.
