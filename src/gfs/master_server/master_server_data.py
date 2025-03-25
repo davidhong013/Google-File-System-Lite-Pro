@@ -17,6 +17,10 @@ class MasterServer:
         self.portion = portion
         self.sleep_second = sleep_second
 
+    @staticmethod
+    def path_name_transform(path: str) -> str:
+        return path.replace("/", "_")
+
     def list_files(self, path:str) -> List[str]:
         result = []
 
@@ -97,7 +101,7 @@ class MasterServer:
                 chunk_address = chunk_object.chunk_address
                 with grpc.insecure_channel(chunk_address) as channel:
                     stub = gfs_pb2_grpc.ChunkServerToMasterServerStub(channel)
-                    request = gfs_pb2.FileRequest(filename=file)
+                    request = gfs_pb2.FileRequest(filename=MasterServer.path_name_transform(file))
                     response = stub.GetNumOfRead(request)
                 if not response or not response.success:
                     print("something happened in dynamic allocation, reading stats stage", file=sys.stderr)
@@ -133,7 +137,7 @@ class MasterServer:
                 file_object.is_busy = True
                 with grpc.insecure_channel(chunk_arr[0].chunk_address) as channel:
                     stub = gfs_pb2_grpc.ChunkServerToMasterServerStub(channel)
-                    request = gfs_pb2.DuplicateRequest(source = chunk_arr[0].chunk_address, destination = sample_address, file_name = file)
+                    request = gfs_pb2.DuplicateRequest(source = chunk_arr[0].chunk_address, destination = sample_address, file_name = MasterServer.path_name_transform(file))
                     response = stub.DuplicateFile(request)
                 if not response or not response.success:
                     print("something happened in dynamic allocation, allocation stage", file=sys.stderr)
