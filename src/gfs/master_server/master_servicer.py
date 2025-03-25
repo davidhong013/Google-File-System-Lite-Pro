@@ -21,7 +21,7 @@ class MasterServerToClientServicer(gfs_pb2_grpc.MasterServerToClientServicer):
         """This function is used to list all the files in the file system, it simply traverses through
         the dictionary and return those who are matched"""
         file_path = request.value
-        print("Command List {}".format(file_path))
+        # print("Command List {}".format(file_path))
         fpls = self.master.list_files(file_path)
         st = "|".join(fpls)
         return gfs_pb2.StringMessage(value=st)

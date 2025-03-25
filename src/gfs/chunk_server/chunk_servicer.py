@@ -83,7 +83,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
 
         #Write to the primary chunk server's disk
         result = self.__inwrite(file_name,content)
-        print('write to the disk successfully')
+        # print('write to the disk successfully')
         if not result:
             return gfs_pb2.ChunkResponse(success=False, message="Writing to the primary chunk failed")
 

@@ -187,7 +187,7 @@ class MasterServer:
             self.__allocate_helper(stats_arr)
 
             #This is merely for debugging purpose
-            self.__print_file_server()
+            # self.__print_file_server()
         return
 
     def start_dynamic_allocation(self) -> None:
