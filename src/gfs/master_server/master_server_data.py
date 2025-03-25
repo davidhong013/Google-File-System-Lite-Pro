@@ -166,6 +166,8 @@ class MasterServer:
     def __print_file_server(self) -> None:
         print('currently printing servers for all of the files')
         for file in self.file_list:
+            if file == '/':
+                continue
             print(file + ": [", end = '')
             for chunk in self.file_list[file].get_chunk_array():
                 print(chunk.chunk_address, end = '')
