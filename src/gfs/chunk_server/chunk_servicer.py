@@ -148,7 +148,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
             del self.metaData[file_name]
 
         #second step, recreate the file and write content to it
-        if not self.__internal_create(file_name) or not self.__inwrite(file_name,content.decode('utf-8')):
+        if not self.__internal_create(file_name) or not self.__inwrite(file_name,content):
             return gfs_pb2.ChunkResponse(success=False, message="Data Recreation failed during synchronization")
 
         return gfs_pb2.ChunkResponse(success=True, message = "Data Synchronization succeeded")
@@ -164,7 +164,7 @@ class ChunkServerToClientServicer(gfs_pb2_grpc.ChunkServerToClientServicer, gfs_
         for index in range(len(file_object.chunks_names_array)):
             directory = './src/gfs/chunk_server/chunk_storage/' + file_name + '_' + str(index)
             with open(directory, 'rb') as file:
-                content += file.read()
+                content += file.read().decode('utf-8')
 
         with grpc.insecure_channel(destination, options=cfg.message_options) as channel:
             stub = gfs_pb2_grpc.ChunkServerToChunkServerStub(channel)
