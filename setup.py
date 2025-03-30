@@ -6,15 +6,23 @@ import setuptools.command.develop
 import setuptools.command.install
 import shutil
 
+
 class BuildProtoCommand(setuptools.command.build_py.build_py):
     def run(self):
         import grpc_tools.protoc
-        chunk_storage_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "src", "gfs", "chunk_server", "chunk_storage")
+
+        chunk_storage_dir = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            "src",
+            "gfs",
+            "chunk_server",
+            "chunk_storage",
+        )
 
         if not os.path.exists(chunk_storage_dir):
             os.makedirs(chunk_storage_dir)  # Create the directory if it doesn't exist
             print(f"Created directory: {chunk_storage_dir}")
-            
+
         if os.path.exists(chunk_storage_dir) and os.path.isdir(chunk_storage_dir):
             for filename in os.listdir(chunk_storage_dir):
                 file_path = os.path.join(chunk_storage_dir, filename)
@@ -22,7 +30,9 @@ class BuildProtoCommand(setuptools.command.build_py.build_py):
                     if os.path.isfile(file_path):
                         os.remove(file_path)  # Remove file
                     elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)  # Remove directory (if any subdirectories exist)
+                        shutil.rmtree(
+                            file_path
+                        )  # Remove directory (if any subdirectories exist)
                     print(f"Deleted: {file_path}")
                 except Exception as e:
                     print(f"Error deleting {file_path}: {e}")
@@ -79,7 +89,7 @@ setuptools.setup(
         "console_scripts": [
             "gfs-master=gfs.master_server.master_main:serve",
             "gfs-client=gfs.client.client:main",
-            "gfs-chunk=gfs.chunk_server.chunk_main:serve"
+            "gfs-chunk=gfs.chunk_server.chunk_main:serve",
         ]
     },
 )
