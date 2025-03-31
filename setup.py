@@ -89,6 +89,7 @@ setuptools.setup(
         "console_scripts": [
             "gfs-master=gfs.master_server.master_main:serve",
             "gfs-client=gfs.client.client:main",
+            "gfs-client-cli=gfs.client.client_cli:main",
             "gfs-chunk=gfs.chunk_server.chunk_main:serve",
         ]
     },
