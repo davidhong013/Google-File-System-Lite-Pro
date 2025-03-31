@@ -3,6 +3,7 @@
 .venv
 .idea
 __pycache__
+config.json
 *.egg-info
 src/gfs/chunk_server/chunk_storage
 build
