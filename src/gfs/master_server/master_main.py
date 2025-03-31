@@ -1,3 +1,4 @@
+import argparse
 import grpc
 
 from concurrent import futures
@@ -5,28 +6,33 @@ from .master_servicer import MasterServerToClientServicer
 from .master_server_data import MasterServer
 from .. import gfs_pb2_grpc
 from ..common import Config as cfg
-import sys
 
 
 def serve():
-
-    # Set up the server with thread pool for handling requests
-    if len(sys.argv) < 4:
-        print(
-            "Error: Please specify if you want to enable dynamic allocation",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    option = sys.argv[1]
-    if option != "dynamic" and option != "undynamic":
-        print(
-            "Error: Please specify if you want to enable dynamic allocation, enter dynamic or undynamic",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    portion = sys.argv[2]
-    sleep_second = sys.argv[3]
-    master = MasterServer(portion=float(portion), sleep_second=int(sleep_second))
+    argparser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="GFS Master Server"
+    )
+    argparser.add_argument(
+        "option",
+        choices=["dynamic", "static"],
+        type=str,
+        help="The option of the master server.",
+    )
+    argparser.add_argument(
+        "portion",
+        type=float,
+        help="The portion of the master server.",
+    )
+    argparser.add_argument(
+        "sleep_second",
+        type=int,
+        help="The sleep second of the master server.",
+    )
+    args: argparse.Namespace = argparser.parse_args()
+    option = args.option
+    portion = args.portion
+    sleep_second = args.sleep_second
+    master = MasterServer(portion=portion, sleep_second=sleep_second)
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=4), options=cfg.message_options
     )

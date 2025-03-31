@@ -1,23 +1,34 @@
+import argparse
 import grpc
 
 from concurrent import futures
 from .chunk_servicer import ChunkServerToClientServicer
 from .. import gfs_pb2, gfs_pb2_grpc
 from ..common import Config as cfg
-import sys
 
 
 def serve():
-    if len(sys.argv) < 3:
-        print("Error: No port provided.\nUsage: gfs-chunk <port>", file=sys.stderr)
-        sys.exit(1)
+    argparser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="GFS Chunk Server"
+    )
+    argparser.add_argument(
+        "ip",
+        type=str,
+        help="The ip of the chunk server.",
+    )
+    argparser.add_argument(
+        "port",
+        type=str,
+        help="The port of the chunk server.",
+    )
 
-    port = sys.argv[2]
-    address = sys.argv[1]
+    args: argparse.Namespace = argparser.parse_args()
+    ip = args.ip
+    port = args.port
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=4), options=cfg.message_options
     )
-    chunk_server_instance = ChunkServerToClientServicer(address)
+    chunk_server_instance = ChunkServerToClientServicer(ip)
     gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(
         chunk_server_instance, server
     )
