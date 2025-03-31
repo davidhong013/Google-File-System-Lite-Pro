@@ -5,6 +5,8 @@ from .chunk_servicer import ChunkServerToClientServicer
 from .. import gfs_pb2, gfs_pb2_grpc
 from ..common import Config as cfg
 import sys
+
+
 def serve():
     if len(sys.argv) < 3:
         print("Error: No port provided.\nUsage: gfs-chunk <port>", file=sys.stderr)
@@ -12,11 +14,19 @@ def serve():
 
     port = sys.argv[2]
     address = sys.argv[1]
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4),options=cfg.message_options)
+    server = grpc.server(
+        futures.ThreadPoolExecutor(max_workers=4), options=cfg.message_options
+    )
     chunk_server_instance = ChunkServerToClientServicer(address)
-    gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(chunk_server_instance,server)
-    gfs_pb2_grpc.add_ChunkServerToChunkServerServicer_to_server(chunk_server_instance,server)
-    gfs_pb2_grpc.add_ChunkServerToMasterServerServicer_to_server(chunk_server_instance,server)
+    gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(
+        chunk_server_instance, server
+    )
+    gfs_pb2_grpc.add_ChunkServerToChunkServerServicer_to_server(
+        chunk_server_instance, server
+    )
+    gfs_pb2_grpc.add_ChunkServerToMasterServerServicer_to_server(
+        chunk_server_instance, server
+    )
 
     server.add_insecure_port(f"[::]:{port}")
 

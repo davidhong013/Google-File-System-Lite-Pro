@@ -41,7 +41,7 @@ This is a toy distributed file system that supports dynamic allocation based on 
 
 To make our directory clean, please check your commit before pushing them to the remote repo to make sure there are no side-effect artifacts like *.pyc, .DS_Store and some other products. And remember run
 ```bash
-find src -name *.py | xargs black *.py
+find src -name "*.py" | xargs black setup.py *.py
 ```
 to format your code so its style looks good.
 

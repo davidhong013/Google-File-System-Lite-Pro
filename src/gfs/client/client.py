@@ -3,7 +3,7 @@ import random
 import grpc
 import os
 import sys
-from typing import List,Dict
+from typing import List, Dict
 from datetime import datetime
 from datasets import load_dataset
 
@@ -14,21 +14,23 @@ from ..common import Config as cfg
 from .client_lease import ClientLease
 
 
-
 class GFSClient:
     def __init__(self):
         """Initialize the GFS Client with configuration"""
         self.master = cfg.master_loc  # Master server location
-        self.fileLocationCache: Dict[str, ClientLease] = {} # maps the file names to ClientLease object
+        self.fileLocationCache: Dict[str, ClientLease] = (
+            {}
+        )  # maps the file names to ClientLease object
         dataset = load_dataset("ag_news")
-        text_data = dataset["train"][0]['text']
+        text_data = dataset["train"][0]["text"]
         self.testing_data_2MB = text_data * 20000
         self.testing_data_5MB = text_data * 40000
+
     @staticmethod
-    def path_name_transform(path:str) -> str:
+    def path_name_transform(path: str) -> str:
         return path.replace("/", "_")
 
-    def verify_lease(self,file_path:str) -> bool:
+    def verify_lease(self, file_path: str) -> bool:
         """communicate with master server to verify if the current lease has the correct version number"""
         try:
             if file_path not in self.fileLocationCache:
@@ -52,7 +54,7 @@ class GFSClient:
             print(f"An error occurred: {e}")
         return True
 
-    def request_lease(self,file_path:str) -> bool:
+    def request_lease(self, file_path: str) -> bool:
         """communicate with master server to get a new lease for a file,
         returns false if no lease can be returned"""
         try:
@@ -67,11 +69,13 @@ class GFSClient:
                 return False
 
             data = file_response.message.split("|")
-            secondary_chunks = None if len(data) < 4 else data[2: -1]
-            client_lease = ClientLease(lease_assign_time=datetime.strptime(data[0], '%H:%M:%S').time(),
-                                       primary_chunk=data[1],
-                                       secondary_chunks=secondary_chunks,
-                                       version_number=data[-1])
+            secondary_chunks = None if len(data) < 4 else data[2:-1]
+            client_lease = ClientLease(
+                lease_assign_time=datetime.strptime(data[0], "%H:%M:%S").time(),
+                primary_chunk=data[1],
+                secondary_chunks=secondary_chunks,
+                version_number=data[-1],
+            )
             self.fileLocationCache[file_path] = client_lease
 
         except grpc.RpcError as e:
@@ -107,14 +111,15 @@ class GFSClient:
                 file_response = stub.CreateFile(request)
 
             if not file_response or not file_response.success:
-                print("File creation failed. Check if the parent directory exists and the current file exists")
+                print(
+                    "File creation failed. Check if the parent directory exists and the current file exists"
+                )
                 return False
 
             data = file_response.message.split("|")
             chunk_index = data[0]
             # Simplified file naming, note that this is a critical STEP !!!!!!!!!!
             file_path = GFSClient.path_name_transform(file_path)
-
 
             for chunk_server in data[1:]:
                 with grpc.insecure_channel(chunk_server) as channel:
@@ -132,7 +137,7 @@ class GFSClient:
             print(f"An error occurred: {e}")
         return True
 
-    def write_to_file(self, file_path: str, content_to_be_written:str) -> bool:
+    def write_to_file(self, file_path: str, content_to_be_written: str) -> bool:
         """Clients write content to a file. Here is the basic work flow
         1.Gets the lock first
         2.Verify the lease
@@ -146,23 +151,33 @@ class GFSClient:
                 file_response = stub.AppendFile(request)
                 # print('Passed the getting lock stage')
             if not file_response or not file_response.success:
-                print("Error occurred, file write failed, check if the file exists in the file system")
+                print(
+                    "Error occurred, file write failed, check if the file exists in the file system"
+                )
                 return False
             if not self.verify_lease(file_path) and not self.request_lease(file_path):
                 return False
             lease_object = self.fileLocationCache[file_path]
             # print('passed the lease stage')
-            with grpc.insecure_channel(lease_object.primary_chunk,options = cfg.message_options) as channel:
+            with grpc.insecure_channel(
+                lease_object.primary_chunk, options=cfg.message_options
+            ) as channel:
                 stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
-                secondary = ''
+                secondary = ""
                 if lease_object.secondary_chunks:
-                    secondary = '|'.join(lease_object.secondary_chunks)
+                    secondary = "|".join(lease_object.secondary_chunks)
                 file_path_for_chunk = GFSClient.path_name_transform(file_path)
-                request = gfs_pb2.AppendRequest(file_name = file_path_for_chunk,content = content_to_be_written,secondary_chunk = secondary)
+                request = gfs_pb2.AppendRequest(
+                    file_name=file_path_for_chunk,
+                    content=content_to_be_written,
+                    secondary_chunk=secondary,
+                )
                 chunk_response = stub.Append(request)
                 # print('Passed the append stage')
             if not chunk_response or not chunk_response.success:
-                print("Error occurred, file write failed, something went wrong with the chunk servers")
+                print(
+                    "Error occurred, file write failed, something went wrong with the chunk servers"
+                )
             with grpc.insecure_channel(self.master) as channel:
                 stub = gfs_pb2_grpc.MasterServerToClientStub(channel)
                 request = gfs_pb2.FileRequest(filename=file_path)
@@ -176,7 +191,7 @@ class GFSClient:
             print(f"An error occurred: {e}")
         return True
 
-    def __get_chunk_numbers(self,file_path:str,chunk_address:str) -> int:
+    def __get_chunk_numbers(self, file_path: str, chunk_address: str) -> int:
         with grpc.insecure_channel(chunk_address) as channel:
             stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
             request = gfs_pb2.FileRequest(filename=file_path)
@@ -185,7 +200,7 @@ class GFSClient:
             return -1
         return int(response.message)
 
-    def read_from_file(self, file_path:str) -> str:
+    def read_from_file(self, file_path: str) -> str:
         """Clients read from a file, and here is the basic work flow
         1.Verify the lease
         2.If the lease does not match, grants the lease
@@ -195,34 +210,43 @@ class GFSClient:
         5.Decode and Concatenate the content"""
         try:
             if not self.verify_lease(file_path) and not self.request_lease(file_path):
-                print('Grant Lease Access Failed, make sure the file exists in the system')
-                return 'Failed'
+                print(
+                    "Grant Lease Access Failed, make sure the file exists in the system"
+                )
+                return "Failed"
             lease_object = self.fileLocationCache[file_path]
             chunk_arr = [lease_object.primary_chunk]  # Start with the primary chunk
             if lease_object.secondary_chunks:
-                chunk_arr.extend(lease_object.secondary_chunks) # Extend with secondary chunks
+                chunk_arr.extend(
+                    lease_object.secondary_chunks
+                )  # Extend with secondary chunks
             num_chunks = 2**31 - 1
             file_path_for_chunk = GFSClient.path_name_transform(file_path)
             for chunk_server in chunk_arr:
-                num_chunks = min(num_chunks, self.__get_chunk_numbers(file_path_for_chunk,chunk_server))
+                num_chunks = min(
+                    num_chunks,
+                    self.__get_chunk_numbers(file_path_for_chunk, chunk_server),
+                )
             if num_chunks == -1:
-                return 'Error Occurred When reading the file'
-            content = ''
+                return "Error Occurred When reading the file"
+            content = ""
             for index in range(num_chunks):
-                sampled_address = random.sample(chunk_arr,1)[0]
+                sampled_address = random.sample(chunk_arr, 1)[0]
                 with grpc.insecure_channel(sampled_address) as channel:
                     stub = gfs_pb2_grpc.ChunkServerToClientStub(channel)
-                    request = gfs_pb2.ReadRequest(filename = file_path_for_chunk,chunk_index = index)
+                    request = gfs_pb2.ReadRequest(
+                        filename=file_path_for_chunk, chunk_index=index
+                    )
                     response = stub.Read(request)
                 if not response or not response.success:
-                    return 'Error Occurred When reading the file'
-                content += response.data.decode('utf-8')
+                    return "Error Occurred When reading the file"
+                content += response.data.decode("utf-8")
             return content
         except grpc.RpcError as e:
             print(f"GRPC Error: {e.code()}: {e.details()}")
         except Exception as e:
             print(f"An error occurred: {e}")
-        return 'Empty'
+        return "Empty"
 
     def run(self):
         """Main loop for client interaction"""
@@ -257,9 +281,13 @@ class GFSClient:
                             file_name, content = parts
                             self.write_to_file(file_name, content)
                         else:
-                            print("Error: 'write' command requires both a file name and content.")
+                            print(
+                                "Error: 'write' command requires both a file name and content."
+                            )
                     else:
-                        print("Error: 'write' command requires a file name and content.")
+                        print(
+                            "Error: 'write' command requires a file name and content."
+                        )
                 elif cmd == "read":
                     if arg:
                         content = self.read_from_file(arg)
@@ -278,18 +306,20 @@ class GFSClient:
                             else:
                                 print("Error: look at the testing write syntaxes")
                         else:
-                            print('Error: "testing_write" command requires both a file name and content.')
+                            print(
+                                'Error: "testing_write" command requires both a file name and content.'
+                            )
                     else:
-                        print("Error: 'testing_write' command requires a file name and content.")
+                        print(
+                            "Error: 'testing_write' command requires a file name and content."
+                        )
                 else:
                     print(f"Unknown command: {cmd}")
 
         except KeyboardInterrupt:
             print("\nProgram interrupted. Exiting...")
 
+
 def main():
     client = GFSClient()
     client.run()
-
-
-

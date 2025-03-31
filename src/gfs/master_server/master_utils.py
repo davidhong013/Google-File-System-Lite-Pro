@@ -3,23 +3,27 @@ import sys
 import os
 from typing import List, Dict
 import threading
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from ..common import Config as cfg, Status
 
 
 class ChunkObject:
-    def __init__(self, chunk_address:str):
+    def __init__(self, chunk_address: str):
         self.chunk_address = chunk_address
+
 
 class FileObject:
     def __init__(self, file_name: str):
         self.file_name = file_name  # Private variable (double underscore)
-        self.version_number = 0 # Private variable, this variable is mainly used to check
-                                # within the heartbeat message.
-                                # we need a hearbeat meassage because the master server is going to dynamically
-                                # allocate chunk servers based on user needs
-                                # we might need a lock for this version number
+        self.version_number = (
+            0  # Private variable, this variable is mainly used to check
+        )
+        # within the heartbeat message.
+        # we need a hearbeat meassage because the master server is going to dynamically
+        # allocate chunk servers based on user needs
+        # we might need a lock for this version number
 
         ##this is the variable that records the corresponding chunk servers for a single file object
         self.__chunk_array = []  # Private variable
@@ -46,7 +50,5 @@ class FileObject:
     def get_chunk_array(self) -> List[ChunkObject]:
         return self.__chunk_array
 
-
-    def add_chunk_server(self,chunk:ChunkObject):
+    def add_chunk_server(self, chunk: ChunkObject):
         self.__chunk_array.append(chunk)
-

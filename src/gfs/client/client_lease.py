@@ -1,8 +1,15 @@
 from datetime import datetime, time, timedelta
 from typing import List
 
+
 class ClientLease:
-    def __init__(self, lease_assign_time: time, primary_chunk: str, secondary_chunks: List[str],version_number:int):
+    def __init__(
+        self,
+        lease_assign_time: time,
+        primary_chunk: str,
+        secondary_chunks: List[str],
+        version_number: int,
+    ):
         self.lease_assign_time = lease_assign_time  # Time when lease was assigned
         self.primary_chunk = primary_chunk
         self.secondary_chunks = secondary_chunks
