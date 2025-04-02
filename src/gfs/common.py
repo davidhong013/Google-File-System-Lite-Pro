@@ -34,7 +34,7 @@ class ConfigImpl(object):
         self.default_chunk_size: int = default_chunk_size
         self.message_options: List[Tuple[str, int]] = message_options
 
-    @classmethod
+    @staticmethod
     def load(f: TextIOWrapper) -> "ConfigImpl":
         config_json: Dict[str, Any] = json.load(f)
         return ConfigImpl(**config_json)

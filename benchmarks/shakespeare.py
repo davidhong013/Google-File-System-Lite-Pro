@@ -2,8 +2,6 @@ from bench import GFSBench
 from typing import List, Tuple
 
 import concurrent.futures
-import contextlib
-import io
 import os
 import random
 import sys
@@ -28,9 +26,7 @@ class ShakespearBench(GFSBench):
         filepath: str = f"/{filename}"
         self._client_cli.run(["create", filepath])
         self._client_cli.run(["write", filepath, content])
-        with contextlib.redirect_stdout(io.StringIO()):
-            self._client_cli.run(["read", filepath])
-        # self._client_cli.run(["read", filepath])
+        self._client_cli.run(["read", filepath])
 
     def run(self):
         inputs: List[Tuple[str, str]] = [
