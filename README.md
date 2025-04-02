@@ -24,13 +24,6 @@ python3 setup.py develop
 ```
 so your update in the source code could be synchronized automatically.
 
-## Docker (some bugs waiting for fix)
-To set up an available on your local machine quickly, you can choose to use docker compose. Please input
-```bash
-dockerc-compose up [-d]
-```
-where `-d` means the deattach mode. You can preappend some environment variables to have some modifications. Please refer to `docker-compose.yaml` for them and their usage.
-
 ## Executable
 
 We provide three executables currently. They're installed after you finished the above step. You can invoke them with the following command in your bash.

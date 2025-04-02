@@ -49,7 +49,7 @@ class ShakespearBench(GFSBench):
         ]
         random.shuffle(inputs)
         with concurrent.futures.ProcessPoolExecutor(
-            max_workers=os.cpu_count() // 4
+            max_workers=os.cpu_count()
         ) as executor:
             for _ in executor.map(
                 self.run_impl,
