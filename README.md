@@ -24,6 +24,13 @@ python3 setup.py develop
 ```
 so your update in the source code could be synchronized automatically.
 
+## Docker
+To set up an available on your local machine quickly, you can choose to use docker compose. Please input
+```bash
+dockerc-compose up [-d]
+```
+where `-d` means the deattach mode. You can preappend some environment variables to have some modifications. Please refer to `docker-compose.yaml` for them and their usage.
+
 ## Executable
 
 We provide three executables currently. They're installed after you finished the above step. You can invoke them with the following command in your bash.
@@ -32,6 +39,7 @@ Note that for starting a chunk server, it requires two arguments, followed by an
 gfs-master [dynamic or undynamic] [digit from 0 to 0.49] [seconds]
 gfs-chunk [ipaddress] [port number]
 gfs-client
+gfs-client-cli [command] [args]
 ```
 
 ## Notifications
