@@ -1,21 +1,21 @@
 services:
   master:
     build: .
-    entrypoint: ["gfs-master", "${GFS_OPTION:-dynamic}", "${GFS_PORTION:-0.49}", "${GFS_SLEEP_SECOND:-10}"]
+    entrypoint: ["gfs-master", "${GFS_OPTION:-dynamic}", "${GFS_PORTION:-0.1}", "${GFS_SLEEP_SECOND:-10}"]
     ports:
       - "${GFS_MASTER_PORT:-50051}:${GFS_MASTER_PORT:-50051}"
   chunk0:
     build: .
-    entrypoint: ["gfs-chunk", "${GFS_IP:-127.0.0.1}", "${GFS_CHUNK0_PORT:-50052}"]
+    entrypoint: ["gfs-chunk", "${GFS_IP:-localhost}", "${GFS_CHUNK0_PORT:-50052}"]
     ports:
       - "${GFS_CHUNK0_PORT:-50052}:${GFS_CHUNK0_PORT:-50052}"
   chunk1:
     build: .
-    entrypoint: ["gfs-chunk", "${GFS_IP:-127.0.0.1}", "${GFS_CHUNK1_PORT:-50053}"]
+    entrypoint: ["gfs-chunk", "${GFS_IP:-localhost}", "${GFS_CHUNK1_PORT:-50053}"]
     ports:
       - "${GFS_CHUNK1_PORT:-50053}:${GFS_CHUNK1_PORT:-50053}"
   chunk2:
     build: .
-    entrypoint: ["gfs-chunk", "${GFS_IP:-127.0.0.1}", "${GFS_CHUNK2_PORT:-50054}"]
+    entrypoint: ["gfs-chunk", "${GFS_IP:-localhost}", "${GFS_CHUNK2_PORT:-50054}"]
     ports:
       - "${GFS_CHUNK2_PORT:-50054}:${GFS_CHUNK2_PORT:-50054}"

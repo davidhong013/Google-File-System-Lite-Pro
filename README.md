@@ -24,7 +24,7 @@ python3 setup.py develop
 ```
 so your update in the source code could be synchronized automatically.
 
-## Docker
+## Docker (some bugs waiting for fix)
 To set up an available on your local machine quickly, you can choose to use docker compose. Please input
 ```bash
 dockerc-compose up [-d]
@@ -49,7 +49,7 @@ This is a toy distributed file system that supports dynamic allocation based on 
 
 To make our directory clean, please check your commit before pushing them to the remote repo to make sure there are no side-effect artifacts like *.pyc, .DS_Store and some other products. And remember run
 ```bash
-find src -name "*.py" | xargs black setup.py *.py
+find benchmarks src -name "*.py" | xargs black setup.py *.py
 ```
 to format your code so its style looks good.
 

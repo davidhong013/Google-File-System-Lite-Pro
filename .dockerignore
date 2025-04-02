@@ -1,10 +1,8 @@
-.DS_Store
+.eggs.DS_Store
 .eggs
-.env
 .venv
 .idea
 __pycache__
-config.json
 *.egg-info
 src/gfs/chunk_server/chunk_storage
 build

@@ -5,7 +5,6 @@ import os
 import sys
 from typing import List, Dict
 from datetime import datetime
-from datasets import load_dataset
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -18,13 +17,7 @@ class GFSClient:
     def __init__(self):
         """Initialize the GFS Client with configuration"""
         self.master = cfg.master_loc  # Master server location
-        self.fileLocationCache: Dict[str, ClientLease] = (
-            {}
-        )  # maps the file names to ClientLease object
-        dataset = load_dataset("ag_news")
-        text_data = dataset["train"][0]["text"]
-        self.testing_data_2MB = text_data * 20000
-        self.testing_data_5MB = text_data * 40000
+        self.fileLocationCache: Dict[str, ClientLease] = {}
 
     @staticmethod
     def path_name_transform(path: str) -> str:

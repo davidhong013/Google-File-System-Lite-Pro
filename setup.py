@@ -79,6 +79,7 @@ setuptools.setup(
     install_requires=[
         "grpcio",
         "protobuf",
+        "requests",
     ],
     cmdclass={
         "build_py": BuildProtoCommand,

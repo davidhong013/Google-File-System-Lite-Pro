@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Optional
 from .client import GFSClient
 
 import argparse
@@ -8,7 +8,7 @@ class GFSClientCli(GFSClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def run(self):
+    def run(self, argv: Optional[list[str]] = None) -> None:
         argparser: argparse.ArgumentParser = argparse.ArgumentParser(
             description="GFS Client CLI"
         )
@@ -36,19 +36,7 @@ class GFSClientCli(GFSClient):
         parser_create.add_argument(
             "filename", type=str, help="The name of the file to read."
         )
-        parser_create = subparsers.add_parser(
-            "testing_write", help="Test to write a file in GFS."
-        )
-        parser_create.add_argument(
-            "type",
-            type=str,
-            help="The name of the file to write.",
-            choices=["small", "medium"],
-        )
-        parser_create.add_argument(
-            "filename", type=str, help="The name of the file to write."
-        )
-        args: argparse.Namespace = argparser.parse_args()
+        args: argparse.Namespace = argparser.parse_args(argv)
         if args.command == "exit":
             print("Exiting GFS client.")
         elif args.command == "list":
@@ -60,13 +48,6 @@ class GFSClientCli(GFSClient):
         elif args.command == "read":
             content: str = self.read_from_file(args.filename)
             print(content)
-        elif args.command == "testing_write":
-            if args.type == "small":
-                self.write_to_file(args.filename, self.testing_data_2MB)
-            elif args.type == "medium":
-                self.write_to_file(args.filename, self.testing_data_100MB)
-            else:
-                assert False, "unreachable"
         else:
             argparser.print_help()
 
