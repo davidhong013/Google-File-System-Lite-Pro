@@ -1,0 +1,16 @@
+{
+  "master_loc": "localhost:5000",
+  "chunkserver_locs": [
+    "localhost:6001",
+    "localhost:6002",
+    "localhost:6003",
+    "localhost:6004",
+    "localhost:6005"
+  ],
+  "chunkserver_root": "root_chunkserver",
+  "default_chunk_size": 1048576,
+  "message_options": [
+    ["grpc.max_receive_message_length", 104857600],
+    ["grpc.max_send_message_length", 104857600]
+  ]
+}
