@@ -11,20 +11,41 @@ def serve():
     argparser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="GFS Chunk Server"
     )
+
+    #config-based way
+    argparser.add_argument(
+        "index",
+        type = int,
+        help = "Index of the chunk server from configuration file."
+    )
+
+    #manual type-in
     argparser.add_argument(
         "ip",
-        type=str,
-        help="The ip of the chunk server.",
+        type = str,
+        help = "Ip of the chunk server.",
     )
     argparser.add_argument(
         "port",
-        type=str,
-        help="The port of the chunk server.",
+        type = str,
+        help = "Port of the chunk server.",
     )
 
     args: argparse.Namespace = argparser.parse_args()
-    ip = args.ip
-    port = args.port
+    if args.index is not None:
+        try:
+            address = cfg.chunkserver_locs[args.index]
+            ip, port = address.split(":")
+            print(f"[ChunkServer-{args.index}] Loaded from config: {ip}:{port}")
+        except (IndexError, ValueError):
+            raise RuntimeError(f"Invalid index or malformed address in config: {cfg.chunkserver_locs}")
+    elif args.ip and args.port:
+        ip = args.ip
+        port = args.port
+        print(f"[ChunkServer] Using manual IP/port: {ip}:{port}")
+    else:
+        raise ValueError("Must provide either --index (for config-based start) or both --ip and --port (manual start)")
+
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=4), options=cfg.message_options
     )
