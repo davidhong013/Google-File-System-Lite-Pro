@@ -9,7 +9,6 @@ from ..common import Config as cfg
 
 
 def serve():
-    from ..common import Config as cfg
     argparser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="GFS Master Server"
     )
