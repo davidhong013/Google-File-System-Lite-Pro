@@ -41,9 +41,11 @@ class ConfigImpl(object):
 
 
 if config_path:
+    print(f"[Config] Loading config from: {config_path}")
     with open(config_path, "r") as f:
         Config: ConfigImpl = ConfigImpl.load(f)
 else:
+    print("[Config] No config path set. Using default configuration.")
     Config: ConfigImpl = ConfigImpl()
 
 
