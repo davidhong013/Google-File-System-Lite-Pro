@@ -49,7 +49,7 @@ def serve():
         # Keep the server running and handle requests
         server.wait_for_termination()  # This is the recommended way to keep the server running
     except KeyboardInterrupt:
-        print("Shutting down server.")
+        print("Shutting down the server.")
         server.stop(0)  # Gracefully stop the server
 
 
