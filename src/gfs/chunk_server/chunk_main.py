@@ -14,19 +14,19 @@ def serve():
 
     #config-based way
     argparser.add_argument(
-        "index",
+        "--index",
         type = int,
         help = "Index of the chunk server from configuration file."
     )
 
     #manual type-in
     argparser.add_argument(
-        "ip",
+        "--ip",
         type = str,
         help = "Ip of the chunk server.",
     )
     argparser.add_argument(
-        "port",
+        "--port",
         type = str,
         help = "Port of the chunk server.",
     )
