@@ -1,7 +1,7 @@
 {
-  "master_loc": "localhost:5000",
+  "master_loc": "44.238.22.255:5000",
   "chunkserver_locs": [
-    "localhost:6001",
+    "35.82.18.108:6001",
     "localhost:6002",
     "localhost:6003",
     "localhost:6004",
