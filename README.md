@@ -29,6 +29,7 @@ so your update in the source code could be synchronized automatically.
 We provide three executables currently. They're installed after you finished the above step. You can invoke them with the following command in your bash.
 Note that for starting a chunk server, it requires two arguments, followed by an ip address and a port number. For starting a master server, it requires 3 arguments: dynamic or undynamic(to enable dynamic allocation), how much portion of data you want to dynamically allocate (up to 0.5), and how often you want to perform dynamic allocation(in seconds)
 ```bash
+GFS_CONFIG_PATH=pwd (for environment variable)
 gfs-master [dynamic or static] [digit from 0 to 0.49] [seconds]
 gfs-chunk [ipaddress] [port number]
 gfs-client
