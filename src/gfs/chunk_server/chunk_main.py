@@ -64,7 +64,7 @@ def serve():
 
     # Start the server
     server.start()
-    print(f"Server started on port {port}.")
+    print(f"Chunk Server started at {ip}:{port}.")
 
     try:
         # Keep the server running and handle requests
