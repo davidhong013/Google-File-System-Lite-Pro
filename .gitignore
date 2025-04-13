@@ -5,7 +5,7 @@
 .idea
 __pycache__
 config.json
-test_config.json
+
 *.egg-info
 src/gfs/chunk_server/chunk_storage
 build
