@@ -5,6 +5,7 @@ import json
 import os
 
 config_path: Optional[str] = os.getenv("GFS_CONFIG_PATH", None)
+print(f"[Config] config_path resolved to: {config_path}")  # ← Add this line
 
 
 class ConfigImpl(object):
