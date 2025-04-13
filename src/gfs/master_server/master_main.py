@@ -39,11 +39,11 @@ def serve():
     gfs_pb2_grpc.add_MasterServerToClientServicer_to_server(
         MasterServerToClientServicer(master=master, option=option), server
     )
-    server.add_insecure_port(cfg.master_loc)
+    server.add_insecure_port("[::]:50051") #124.124.1251 localhost:50051
 
     # Start the server
     server.start()
-    print(f"Server started on {cfg.master_loc}.")
+    print("Server started on port 50051.")
 
     try:
         # Keep the server running and handle requests
