@@ -39,10 +39,17 @@ gfs-client-cli [command] [args]
 This is a toy distributed file system that supports dynamic allocation based on users visits frequencies on files. Note that it does not provide any fault tolerance or back up mechanism. If a server is down, the data will be gone forever and requires restart of the entire system. Further implementations on fault tolerance will be needed if such distributed file system wants to be put into production.
 
 ## Benchmarks
-We currently support four benchmarks, read heavy tasks, write heavy tasks, repetitve read on a single file, and random read and write
+We currently support four benchmarks, read heavy tasks, write heavy tasks, repetitve read on a single file, and random read and write.
 
 ## Configurations
-Under Development
+Once configuration file is ready and env.sh is sourced, you can start your services:
+```commandline
+source env.sh
+```
+To check if you are on the right environment or path:
+```commandline
+python check_env.py
+```
 
 ## Format Your Code
 
