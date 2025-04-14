@@ -43,8 +43,8 @@ class MasterServer:
         for address in sampled_address:
             chunk = ChunkObject(address)
             file_object.add_chunk_server(chunk)
-        with self.file_list_lock:
-            self.file_list[path] = file_object
+
+        self.file_list[path] = file_object
         return sampled_address
 
     def request_lease(self, path: str) -> List[str]:
