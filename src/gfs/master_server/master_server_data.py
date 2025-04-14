@@ -19,6 +19,7 @@ class MasterServer:
         self.file_list["/"] = None
         self.portion = portion
         self.sleep_second = sleep_second
+        self.file_list_lock = threading.Lock()  # Add a lock for the file list
 
     @staticmethod
     def path_name_transform(path: str) -> str:
@@ -42,7 +43,8 @@ class MasterServer:
         for address in sampled_address:
             chunk = ChunkObject(address)
             file_object.add_chunk_server(chunk)
-        self.file_list[path] = file_object
+        with self.file_list_lock:
+            self.file_list[path] = file_object
         return sampled_address
 
     def request_lease(self, path: str) -> List[str]:
@@ -94,7 +96,7 @@ class MasterServer:
 
     def __getStatistics(self) -> List[List]:
         stats_Arr = []
-        for file in self.file_list:
+        for file in self.file_list.keys():
             if file == "/":
                 continue
             total_num_read = 0
