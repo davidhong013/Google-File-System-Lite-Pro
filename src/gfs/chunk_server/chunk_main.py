@@ -26,7 +26,7 @@ def serve():
     ip = args.ip
     port = args.port
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=12), options=cfg.message_options
+        futures.ThreadPoolExecutor(max_workers=48), options=cfg.message_options
     )
     chunk_server_instance = ChunkServerToClientServicer(ip)
     gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(

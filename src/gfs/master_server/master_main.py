@@ -34,7 +34,7 @@ def serve():
     sleep_second = args.sleep_second
     master = MasterServer(portion=portion, sleep_second=sleep_second)
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=24), options=cfg.message_options
+        futures.ThreadPoolExecutor(max_workers=96), options=cfg.message_options
     )
     gfs_pb2_grpc.add_MasterServerToClientServicer_to_server(
         MasterServerToClientServicer(master=master, option=option), server

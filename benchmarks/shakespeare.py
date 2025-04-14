@@ -117,8 +117,8 @@ class ShakespearBench(GFSBench):
                 ]
                 for _ in range(16)
             ]
-            self._client_cli.run(["create", rep_inputs[0][0]])
-            self._client_cli.run(["write", rep_inputs[0][0],rep_inputs[0][1]])
+            self._client_cli.run(["create", f"/{rep_inputs[0][0]}"])
+            self._client_cli.run(["write", f"/{rep_inputs[0][0]}",rep_inputs[0][1]])
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=4
             ) as executor:
