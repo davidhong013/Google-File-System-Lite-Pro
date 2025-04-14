@@ -2,7 +2,8 @@
   "chunk_size": 2,
   "master_loc": "44.238.22.255:50051",
   "chunkserver_locs": [
-            "35.82.18.108:50051"
+            "35.82.18.108:50051",
+            "18.222.251.187:50051"
         ],
   "chunkserver_root": "root_chunkserver",
   "default_chunk_size": 1048576,
