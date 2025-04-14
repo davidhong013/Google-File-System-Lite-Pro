@@ -21,12 +21,19 @@ class ShakespearBench(GFSBench):
         )
         self._hamlet: str = "https://www.gutenberg.org/cache/epub/27761/pg27761.txt"
 
+
+    def rep_read(self,args:Tuple[str,str]):
+        filename, content = args
+        filepath: str = f"/{filename}"
+        self._client_cli.run(["read", filepath])
+        self._client_cli.run(["read", filepath])
+        self._client_cli.run(["read", filepath])
+        self._client_cli.run(["read", filepath])
+
     def random_read_write(self, args: Tuple[str, str]):
         filename, content = args
-        print('hi im here')
         filepath: str = f"/{filename}"
         self._client_cli.run(["create", filepath])
-
         self._client_cli.run(["write", filepath, content])
         self._client_cli.run(["read", filepath])
 
@@ -74,7 +81,7 @@ class ShakespearBench(GFSBench):
         if task == "random_read_write":
             with concurrent.futures.ProcessPoolExecutor(
                 # max_workers=os.cpu_count()
-                max_workers=os.cpu_count()
+                max_workers=4
             ) as executor:
                 for _ in executor.map(
                     self.random_read_write,
@@ -83,7 +90,7 @@ class ShakespearBench(GFSBench):
                     pass
         elif task == 'write_heavy':
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=os.cpu_count()
+                max_workers=4
             ) as executor:
                 for _ in executor.map(
                     self.write_heavy,
@@ -92,7 +99,7 @@ class ShakespearBench(GFSBench):
                     pass
         elif task == 'read_heavy':
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=os.cpu_count()
+                max_workers=4
             ) as executor:
                 for _ in executor.map(
                     self.read_heavy,
@@ -101,20 +108,22 @@ class ShakespearBench(GFSBench):
                     pass
         elif task == 'rep_read':
             rep_inputs: List[Tuple[str, str]] = [
-                (f"{name}_{counter}.txt", content)
+                (f"{name}.txt", content)
                 for name, content in [
                     (
                         "Romeo and Juliet by William Shakespeare",
                         self.cache_get(self._remeo_and_juliet),
                     )
                 ]
-                for counter in range(16)
+                for _ in range(16)
             ]
+            self._client_cli.run(["create", rep_inputs[0][0]])
+            self._client_cli.run(["write", rep_inputs[0][0],rep_inputs[0][1]])
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=os.cpu_count()
+                max_workers=4
             ) as executor:
                 for _ in executor.map(
-                    self.read_heavy,
+                    self.rep_read,
                     rep_inputs,
                 ):
                     pass
