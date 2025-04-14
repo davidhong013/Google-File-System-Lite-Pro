@@ -71,7 +71,8 @@ class ShakespearBench(GFSBench):
         random.shuffle(inputs)
         if task == "random_read_write":
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=os.cpu_count()
+                # max_workers=os.cpu_count()
+                max_workers=1
             ) as executor:
                 for _ in executor.map(
                     self.random_read_write,
