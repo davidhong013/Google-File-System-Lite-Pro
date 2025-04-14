@@ -96,7 +96,7 @@ class MasterServer:
 
     def __getStatistics(self) -> List[List]:
         stats_Arr = []
-        for file in self.file_list.keys():
+        for file in list(self.file_list.keys()):
             if file == "/":
                 continue
             total_num_read = 0

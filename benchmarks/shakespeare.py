@@ -23,8 +23,10 @@ class ShakespearBench(GFSBench):
 
     def random_read_write(self, args: Tuple[str, str]):
         filename, content = args
+        print('hi im here')
         filepath: str = f"/{filename}"
         self._client_cli.run(["create", filepath])
+
         self._client_cli.run(["write", filepath, content])
         self._client_cli.run(["read", filepath])
 
