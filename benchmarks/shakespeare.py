@@ -55,8 +55,8 @@ class ShakespearBench(GFSBench):
         self._client_cli.run(["read", filepath])
         self._client_cli.run(["write", filepath, content])
         self._client_cli.run(["write", filepath, content])
-        self._client_cli.run(["write", filepath, content])
-        self._client_cli.run(["write", filepath, content])
+        # self._client_cli.run(["write", filepath, content])
+        # self._client_cli.run(["write", filepath, content])
 
     def run(self, task:str):
         inputs: List[Tuple[str, str]] = [
@@ -129,6 +129,7 @@ class ShakespearBench(GFSBench):
                     pass
 
 if __name__ == "__main__":
+    import time
     parser = argparse.ArgumentParser(description="GFS Lite Pro Benchmark")
     parser.add_argument(
         "--task",
@@ -138,4 +139,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     bench: ShakespearBench = ShakespearBench()
+    start = time.time()
     bench.run(task = args.task)
+    end = time.time()  # ⏱ End timer
+    print(f"Task '{args.task}' completed in {end - start:.2f} seconds.")
