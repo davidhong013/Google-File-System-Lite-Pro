@@ -47,7 +47,7 @@ def serve():
         raise ValueError("Must provide either --index (for config-based start) or both --ip and --port (manual start)")
 
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=4), options=cfg.message_options
+        futures.ThreadPoolExecutor(max_workers=48), options=cfg.message_options
     )
     chunk_server_instance = ChunkServerToClientServicer(ip)
     gfs_pb2_grpc.add_ChunkServerToClientServicer_to_server(

@@ -1,14 +1,17 @@
 {
-  "chunk_size": 2,
-  "master_loc": "54.201.53.66:50051",
-  "chunkserver_locs": [
-            "35.95.188.241:50052",
-            "35.95.188.241:50051"
-        ],
-  "chunkserver_root": "root_chunkserver",
-  "default_chunk_size": 1048576,
-  "message_options": [
-            ["grpc.max_receive_message_length", 104857600],
-            ["grpc.max_send_message_length", 104857600]
-        ]
-}
+   "chunk_size": 5,
+   "master_loc": "54.201.53.66:50051",
+   "chunkserver_locs": [
+             "35.95.188.241:50051",
+             "35.82.18.108:50051",
+              "44.238.22.255:50051",
+              "3.144.72.207:50051",
+              "18.224.199.169:50051"
+         ],
+   "chunkserver_root": "root_chunkserver",
+   "default_chunk_size": 1048576,
+   "message_options": [
+             ["grpc.max_receive_message_length", 104857600],
+             ["grpc.max_send_message_length", 104857600]
+         ]
+ }

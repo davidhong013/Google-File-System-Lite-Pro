@@ -27,9 +27,14 @@ class ChunkServerToClientServicer(
         self.metaData[file_name] = file_object
         directory = "./src/gfs/chunk_server/chunk_storage/" + file_name + "_0"
 
-        with open(directory, "wb") as file:
-            text = "Initiated a file in GFS_Lite_Pro\n"
-            file.write(text.encode("utf-8"))
+        try:
+            with open(directory, "wb") as file:
+                text = "Initiated a file in GFS_Lite_Pro\n"
+                file.write(text.encode("utf-8"))
+        except Exception as e:
+            print(f"[ERROR] Failed to create file '{directory}': {e}")
+            return gfs_pb2.ChunkResponse(success=False, message=f"Failed to initiate file: {e}")
+
         return gfs_pb2.ChunkResponse(success=True, message="Initiated a file")
 
     def __internal_create(self, file_name) -> bool:
